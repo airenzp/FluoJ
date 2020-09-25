@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+  
+<hibernate-configuration>
+    <session-factory>
+          <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL92Dialect</property>
+
+        <!-- Connection settings -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/fluoj</property>
+        <property name="hibernate.connection.username">fluoj</property>
+        <property name="hibernate.connection.password">fluoj</property>
+        <property name="javax.persistence.schema-generation.scripts.action" value="create"/>
+        <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
+        <property name="javax.persistence.schema-generation.scripts.create-target" value="target/jpa/sql/create-schema.sql"/>
+        <!-- SQL dialect -->
+  
+        <!-- Print executed SQL to stdout -->
+        <property name="show_sql">true</property>
+  
+        <!-- Update database on startup -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+  
+        <!-- Annotated entity classes -->
+        <mapping class="com.nbis.fluoj.persistence.Cell"/>
+        <mapping class="com.nbis.fluoj.persistence.Cellfeature"/>
+        <mapping class="com.nbis.fluoj.persistence.CellfeaturePK"/>
+        <mapping class="com.nbis.fluoj.persistence.Feature"/>
+        <mapping class="com.nbis.fluoj.persistence.Ftprobability"/>
+        <mapping class="com.nbis.fluoj.persistence.Imagefeature"/>
+        <mapping class="com.nbis.fluoj.persistence.ImagefeaturePK"/>
+        <mapping class="com.nbis.fluoj.persistence.Imageresource"/>
+        <mapping class="com.nbis.fluoj.persistence.Sample"/>
+        <mapping class="com.nbis.fluoj.persistence.Samplecorefeature"/>
+        <mapping class="com.nbis.fluoj.persistence.SamplecorefeaturePK"/>
+        <mapping class="com.nbis.fluoj.persistence.Samplefeature"/>
+        <mapping class="com.nbis.fluoj.persistence.SamplefeaturePK"/>
+        <mapping class="com.nbis.fluoj.persistence.Samplefilter"/>
+        <mapping class="com.nbis.fluoj.persistence.SamplefilterPK"/>
+        <mapping class="com.nbis.fluoj.persistence.Scell"/>
+        <mapping class="com.nbis.fluoj.persistence.Scellfeature"/>
+        <mapping class="com.nbis.fluoj.persistence.ScellfeaturePK"/>
+        <mapping class="com.nbis.fluoj.persistence.Separation"/>
+        <mapping class="com.nbis.fluoj.persistence.Session"/>
+        <mapping class="com.nbis.fluoj.persistence.Type"/>
+         
+    </session-factory>
+</hibernate-configuration>
