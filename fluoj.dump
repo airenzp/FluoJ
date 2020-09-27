@@ -1,0 +1,483 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.3
+-- Dumped by pg_dump version 12.3
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: cell; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.cell (
+    idcell integer NOT NULL,
+    x smallint,
+    y smallint,
+    date date,
+    idimage smallint
+);
+
+
+ALTER TABLE public.cell OWNER TO fluoj;
+
+--
+-- Name: cell_feature; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.cell_feature (
+    idcell integer NOT NULL,
+    idfeature smallint NOT NULL,
+    value real
+);
+
+
+ALTER TABLE public.cell_feature OWNER TO fluoj;
+
+--
+-- Name: cell_type; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.cell_type (
+    idcell_type smallint NOT NULL,
+    name character varying(50),
+    label character varying(50),
+    color character varying(50),
+    training_min smallint
+);
+
+
+ALTER TABLE public.cell_type OWNER TO fluoj;
+
+--
+-- Name: feature; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.feature (
+    idfeature smallint NOT NULL,
+    name character varying(50) NOT NULL,
+    description character varying(500)
+);
+
+
+ALTER TABLE public.feature OWNER TO fluoj;
+
+--
+-- Name: filter; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.filter (
+    idfilter smallint NOT NULL,
+    command character varying(500),
+    options character varying(500),
+    idsample smallint
+);
+
+
+ALTER TABLE public.filter OWNER TO fluoj;
+
+--
+-- Name: image; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.image (
+    idimage integer NOT NULL,
+    date date,
+    name character varying(50),
+    idsample smallint
+);
+
+
+ALTER TABLE public.image OWNER TO fluoj;
+
+--
+-- Name: probability; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.probability (
+    idcell_type smallint NOT NULL,
+    idfeature smallint NOT NULL,
+    x smallint,
+    frequence integer,
+    probability real
+);
+
+
+ALTER TABLE public.probability OWNER TO fluoj;
+
+--
+-- Name: sample; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.sample (
+    idsample smallint NOT NULL,
+    name character varying(50),
+    image_threshold smallint
+);
+
+
+ALTER TABLE public.sample OWNER TO fluoj;
+
+--
+-- Name: sample_feature; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.sample_feature (
+    idsample smallint NOT NULL,
+    idfeature smallint NOT NULL,
+    min real,
+    max real,
+    active boolean,
+    internal boolean
+);
+
+
+ALTER TABLE public.sample_feature OWNER TO fluoj;
+
+--
+-- Name: scell; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.scell (
+    idscell integer NOT NULL,
+    x smallint,
+    y smallint,
+    idimage integer
+);
+
+
+ALTER TABLE public.scell OWNER TO fluoj;
+
+--
+-- Name: scell_feature; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.scell_feature (
+    idscell integer NOT NULL,
+    idfeature smallint NOT NULL,
+    value real
+);
+
+
+ALTER TABLE public.scell_feature OWNER TO fluoj;
+
+--
+-- Name: session; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.session (
+    idsession smallint NOT NULL,
+    name character varying(50),
+    date date,
+    idsample smallint
+);
+
+
+ALTER TABLE public.session OWNER TO fluoj;
+
+--
+-- Data for Name: cell; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.cell (idcell, x, y, date, idimage) FROM stdin;
+\.
+
+
+--
+-- Data for Name: cell_feature; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.cell_feature (idcell, idfeature, value) FROM stdin;
+\.
+
+
+--
+-- Data for Name: cell_type; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.cell_type (idcell_type, name, label, color, training_min) FROM stdin;
+\.
+
+
+--
+-- Data for Name: feature; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.feature (idfeature, name, description) FROM stdin;
+\.
+
+
+--
+-- Data for Name: filter; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.filter (idfilter, command, options, idsample) FROM stdin;
+\.
+
+
+--
+-- Data for Name: image; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.image (idimage, date, name, idsample) FROM stdin;
+\.
+
+
+--
+-- Data for Name: probability; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.probability (idcell_type, idfeature, x, frequence, probability) FROM stdin;
+\.
+
+
+--
+-- Data for Name: sample; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.sample (idsample, name, image_threshold) FROM stdin;
+\.
+
+
+--
+-- Data for Name: sample_feature; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.sample_feature (idsample, idfeature, min, max, active, internal) FROM stdin;
+\.
+
+
+--
+-- Data for Name: scell; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.scell (idscell, x, y, idimage) FROM stdin;
+\.
+
+
+--
+-- Data for Name: scell_feature; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.scell_feature (idscell, idfeature, value) FROM stdin;
+\.
+
+
+--
+-- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.session (idsession, name, date, idsample) FROM stdin;
+\.
+
+
+--
+-- Name: cell_feature cell_feature_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell_feature
+    ADD CONSTRAINT cell_feature_pkey PRIMARY KEY (idcell, idfeature);
+
+
+--
+-- Name: cell cell_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell
+    ADD CONSTRAINT cell_pkey PRIMARY KEY (idcell);
+
+
+--
+-- Name: cell_type cell_type_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell_type
+    ADD CONSTRAINT cell_type_pkey PRIMARY KEY (idcell_type);
+
+
+--
+-- Name: feature feature_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.feature
+    ADD CONSTRAINT feature_pkey PRIMARY KEY (idfeature);
+
+
+--
+-- Name: filter filter_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.filter
+    ADD CONSTRAINT filter_pkey PRIMARY KEY (idfilter);
+
+
+--
+-- Name: image image_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.image
+    ADD CONSTRAINT image_pkey PRIMARY KEY (idimage);
+
+
+--
+-- Name: probability probability_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.probability
+    ADD CONSTRAINT probability_pkey PRIMARY KEY (idcell_type, idfeature);
+
+
+--
+-- Name: sample_feature sample_feature_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample_feature
+    ADD CONSTRAINT sample_feature_pkey PRIMARY KEY (idsample, idfeature);
+
+
+--
+-- Name: sample sample_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_pkey PRIMARY KEY (idsample);
+
+
+--
+-- Name: scell_feature scell_feature_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell_feature
+    ADD CONSTRAINT scell_feature_pkey PRIMARY KEY (idscell, idfeature);
+
+
+--
+-- Name: scell scell_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell
+    ADD CONSTRAINT scell_pkey PRIMARY KEY (idscell);
+
+
+--
+-- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (idsession);
+
+
+--
+-- Name: cell_feature cell_feature_idcell_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell_feature
+    ADD CONSTRAINT cell_feature_idcell_fkey FOREIGN KEY (idcell) REFERENCES public.cell(idcell);
+
+
+--
+-- Name: cell_feature cell_feature_idfeature_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell_feature
+    ADD CONSTRAINT cell_feature_idfeature_fkey FOREIGN KEY (idfeature) REFERENCES public.feature(idfeature);
+
+
+--
+-- Name: cell cell_idimage_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell
+    ADD CONSTRAINT cell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+
+
+--
+-- Name: cell cell_idimage_fkey1; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell
+    ADD CONSTRAINT cell_idimage_fkey1 FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+
+
+--
+-- Name: filter filter_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.filter
+    ADD CONSTRAINT filter_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
+
+
+--
+-- Name: image image_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.image
+    ADD CONSTRAINT image_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
+
+
+--
+-- Name: probability probability_idcell_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.probability
+    ADD CONSTRAINT probability_idcell_type_fkey FOREIGN KEY (idcell_type) REFERENCES public.cell_type(idcell_type);
+
+
+--
+-- Name: probability probability_idfeature_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.probability
+    ADD CONSTRAINT probability_idfeature_fkey FOREIGN KEY (idfeature) REFERENCES public.feature(idfeature);
+
+
+--
+-- Name: sample_feature sample_feature_idfeature_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample_feature
+    ADD CONSTRAINT sample_feature_idfeature_fkey FOREIGN KEY (idfeature) REFERENCES public.feature(idfeature);
+
+
+--
+-- Name: sample_feature sample_feature_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample_feature
+    ADD CONSTRAINT sample_feature_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
+
+
+--
+-- Name: scell scell_idimage_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell
+    ADD CONSTRAINT scell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+
+
+--
+-- Name: session session_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
