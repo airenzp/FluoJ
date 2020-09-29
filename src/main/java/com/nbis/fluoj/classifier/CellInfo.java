@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Type;
 
 /**
  * Class used by {@link classifier.SegmentedParticle} to retrieve/store
- * {@link persistence.Scellfeature Scellfeatures} obtained.
+ * {@link persistence.ScellFeature ScellFeatures} obtained.
  * 
  * @author Airen
  * 
@@ -35,19 +35,19 @@ public class CellInfo
 	{
 		if (il.getPoints().isEmpty())
 			throw new IllegalArgumentException("No points provided");
-		if ((il.getROIS() == null || il.getROIS().isEmpty()) && il.getSample().getRoismax() > 0)
+		if ((il.getROIS() == null || il.getROIS().isEmpty()) && il.getSample().getRoisThreshold() > 0)
 			throw new IllegalArgumentException("No inner labels provided");
 		this.particle = il;
 		this.ils = new ParticleStatistic(il);
 		initROIsFeatures();
 
 		if (typed)
-			this.type = il.getSample().getType();
+			this.type = il.getSample().getIdtype();
 	}
 
 	void initROIsFeatures()
 	{
-		if (particle.getSample().getRoismax() > 0)
+		if (particle.getSample().getRoisThreshold() > 0)
 		{
 			roismaxarea = Double.NEGATIVE_INFINITY;
 			roiscount = particle.getROIS().size();
@@ -253,7 +253,7 @@ public class CellInfo
 	 * 
 	 * @return Particle type
 	 */
-	public Type getType()
+	public Type getIdtype()
 	{
 		return type;
 	}

@@ -19,10 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import com.nbis.fluoj.persistence.Feature;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplecorefeature;
-import com.nbis.fluoj.persistence.SamplecorefeaturePK;
-import com.nbis.fluoj.persistence.Samplefeature;
-import com.nbis.fluoj.persistence.SamplefeaturePK;
+import com.nbis.fluoj.persistence.SampleFeature;
+import com.nbis.fluoj.persistence.SampleFeaturePK;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
@@ -39,8 +37,8 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 	private Sample sample;
 	private FluoJImageProcessor cip;
 	private JButton loadimgbt;
-	private List<Samplecorefeature> scfs;
-	private Samplecorefeature sf;
+	private List<SampleFeature> scfs;
+	private SampleFeature sf;
 	private ConfigurationJFrame frame;
 	private JLabel descriptionlb;
 
@@ -58,7 +56,7 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 		constraints.anchor = GridBagConstraints.WEST;
 
 		this.sample = parent.getSample();
-		scfs = new ArrayList<Samplecorefeature>(sample.getSamplecorefeatureList());
+		scfs = new ArrayList<SampleFeature>(sample.getSampleFeatureList());
 		frame = (ConfigurationJFrame) parent.getParent();
 
 		add(new JLabel("Feature"),
@@ -75,8 +73,8 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 		descriptionlb = new JLabel(feature.getDescription());
 		add(descriptionlb, FluoJUtils.getConstraints(constraints, 1, 1, 1));
 		cip = frame.getCImageProcess();
-		sf = new Samplecorefeature();
-		sf.setSamplecorefeaturePK(new SamplecorefeaturePK(parent.getSample()
+		sf = new SampleFeature();
+		sf.setSampleFeaturePK(new SampleFeaturePK(parent.getSample()
 				.getIdsample(), feature.getIdfeature()));
 		sf.setFeature(feature);
 		sf.setMin(cip.getROISMin(feature.getIdfeature()));
@@ -139,7 +137,7 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 				sf.setMax(max);
 				frame.resetCImageProcess();
 				try {
-					frame.processImageParticles(sample.getSamplefeatureList(), scfs);
+					frame.processImageParticles(sample.getSampleFeatureList(), scfs);
 				} catch (InvalidOperationOnResourceException e1) {
 					JOptionPane.showMessageDialog(AddSampleROIFeatureJDialog.this, e1.getMessage());
 				}
@@ -151,7 +149,7 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				feature = (Feature) featurecb.getSelectedItem();
-				sf.setSamplecorefeaturePK(new SamplecorefeaturePK(sample.getIdsample(),
+				sf.setSampleFeaturePK(new SampleFeaturePK(sample.getIdsample(),
 						feature.getIdfeature()));
 				sf.setFeature(feature);
 				sf.setMin(cip.getROISMin(feature.getIdfeature()));
@@ -180,7 +178,7 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 						double max = ((Number) maxtf.getValue()).doubleValue();
 						sf.setMin(min);
 						sf.setMax(max);
-						parent.addSamplecorefeature(sf);
+						parent.addSampleFeature(sf);
 					}
 				} catch (IllegalArgumentException ex) {
 					JOptionPane.showMessageDialog(AddSampleROIFeatureJDialog.this,

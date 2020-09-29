@@ -3,8 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
+import com.nbis.fluoj.classifier.ConfigurationDB;
+import ij.ImagePlus;
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -28,14 +31,14 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author airen
  */
 @Entity
-@Table(name = "image")
+@Table(name = "sample_image")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Image.findAll", query = "SELECT i FROM Image i"),
-    @NamedQuery(name = "Image.findByIdimage", query = "SELECT i FROM Image i WHERE i.idimage = :idimage"),
-    @NamedQuery(name = "Image.findByDate", query = "SELECT i FROM Image i WHERE i.date = :date"),
-    @NamedQuery(name = "Image.findByName", query = "SELECT i FROM Image i WHERE i.name = :name")})
-public class Image implements Serializable {
+    @NamedQuery(name = "SampleImage.findAll", query = "SELECT s FROM SampleImage s"),
+    @NamedQuery(name = "SampleImage.findByIdimage", query = "SELECT s FROM SampleImage s WHERE s.idimage = :idimage"),
+    @NamedQuery(name = "SampleImage.findByDate", query = "SELECT s FROM SampleImage s WHERE s.date = :date"),
+    @NamedQuery(name = "SampleImage.findByName", query = "SELECT s FROM SampleImage s WHERE s.name = :name")})
+public class SampleImage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,18 +50,20 @@ public class Image implements Serializable {
     private Date date;
     @Column(name = "name", length = 50)
     private String name;
+    @OneToMany(mappedBy = "idimage")
+    private List<Cell> cellList;
+    @OneToMany(mappedBy = "idimage")
+    private List<Sample> sampleList;
     @JoinColumn(name = "idsample", referencedColumnName = "idsample")
     @ManyToOne
     private Sample idsample;
     @OneToMany(mappedBy = "idimage")
     private List<Scell> scellList;
-    @OneToMany(mappedBy = "idimage")
-    private List<Cell> cellList;
 
-    public Image() {
+    public SampleImage() {
     }
 
-    public Image(Integer idimage) {
+    public SampleImage(Integer idimage) {
         this.idimage = idimage;
     }
 
@@ -86,6 +91,24 @@ public class Image implements Serializable {
         this.name = name;
     }
 
+    @XmlTransient
+    public List<Cell> getCellList() {
+        return cellList;
+    }
+
+    public void setCellList(List<Cell> cellList) {
+        this.cellList = cellList;
+    }
+
+    @XmlTransient
+    public List<Sample> getSampleList() {
+        return sampleList;
+    }
+
+    public void setSampleList(List<Sample> sampleList) {
+        this.sampleList = sampleList;
+    }
+
     public Sample getIdsample() {
         return idsample;
     }
@@ -103,15 +126,6 @@ public class Image implements Serializable {
         this.scellList = scellList;
     }
 
-    @XmlTransient
-    public List<Cell> getCellList() {
-        return cellList;
-    }
-
-    public void setCellList(List<Cell> cellList) {
-        this.cellList = cellList;
-    }
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -122,10 +136,10 @@ public class Image implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Image)) {
+        if (!(object instanceof SampleImage)) {
             return false;
         }
-        Image other = (Image) object;
+        SampleImage other = (SampleImage) object;
         if ((this.idimage == null && other.idimage != null) || (this.idimage != null && !this.idimage.equals(other.idimage))) {
             return false;
         }
@@ -134,7 +148,20 @@ public class Image implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.Image[ idimage=" + idimage + " ]";
+        return "SampleImage[ idimage=" + idimage + " ]";
     }
+    
+    public ImagePlus getImagePlus() {
+        if (idimage == null) {
+            return null;
+        }
+        return new ImagePlus(getPath());
+    }
+
+    public String getPath() {
+        return ConfigurationDB.imagesdir + File.separator + idimage + ".tif";
+
+    }
+
     
 }

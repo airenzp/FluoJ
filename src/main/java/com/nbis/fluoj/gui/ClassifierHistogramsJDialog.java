@@ -18,7 +18,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.CellProcessor;
 import com.nbis.fluoj.classifier.ProcessorDB;
@@ -46,13 +46,13 @@ public class ClassifierHistogramsJDialog extends JDialog {
 		String title;
 		double min, max, x, y;
 		
-		for (Samplefeature sf : parent.getSample().getSamplefeatureList())
-			if (sf.getUseonclassification() == 1) {
+		for (SampleFeature sf : parent.getSample().getSampleFeatureList())
+			if (sf.getActive()) {
 				max = ConfigurationDB.getMaxForFeatureOnSample(sf.getSample().getIdsample(), sf.getFeature().getIdfeature(), parent.em);
 				min = ConfigurationDB.getMinForFeatureOnSample(sf.getSample().getIdsample(), sf.getFeature().getIdfeature(), parent.em);
 				double step = (max - min) / (CellProcessor.marks + 1);
 				for (com.nbis.fluoj.persistence.Type t : parent.getSample().getTypeList()) {
-					if (!t.getFtprobabilityList().isEmpty()) {
+					if (!t.getProbabilityList().isEmpty()) {
 						histogram = pdb.getHistograms(t.getIdtype(), sf.getFeature().getIdfeature(), parent.em);
 						title =  t.getName();
 						XYSeries series = new XYSeries(title);
@@ -69,7 +69,7 @@ public class ClassifierHistogramsJDialog extends JDialog {
 						
 						XYDataset histogramds = new XYSeriesCollection(series);
 
-						JFreeChart chart = ChartFactory.createXYLineChart(title, sf.getFeature().getFeature(), "Probability", histogramds, PlotOrientation.VERTICAL, false, false, true);
+						JFreeChart chart = ChartFactory.createXYLineChart(title, sf.getFeature().getName(), "Probability", histogramds, PlotOrientation.VERTICAL, false, false, true);
 						chart.getXYPlot().getDomainAxis().setRange(new Range(min , max ));
 						chart.getXYPlot().getRangeAxis().setRange(new Range(0, 0.5));
 						chartpn = new ChartPanel(chart);

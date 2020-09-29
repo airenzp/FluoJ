@@ -27,8 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefilter;
-import com.nbis.fluoj.persistence.SamplefilterPK;
+import com.nbis.fluoj.persistence.Filter;
 import com.nbis.fluoj.persistence.Separation;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
@@ -52,7 +51,7 @@ public class AddSampleJDialog extends JDialog
 	private JCheckBox fillchb;
 	private JComboBox separationscb;
 	private List<Separation> separations;
-	private ArrayList<Samplefilter> filters;
+	private ArrayList<Filter> filters;
 	private JFormattedTextField expansionradiustf;
 	private PreprocessingPane filterspn;
 	private JPanel segmentationpn;
@@ -67,15 +66,13 @@ public class AddSampleJDialog extends JDialog
 
 		sample = new Sample();
 
-		filters = new ArrayList<Samplefilter>();
-		Samplefilter eightfilter = new Samplefilter();// always must apply this
-		SamplefilterPK pk = new SamplefilterPK();
-		pk.setIdfilter(1);
-		eightfilter.setSamplefilterPK(pk);
+		filters = new ArrayList<Filter>();
+		Filter eightfilter = new Filter();// always must apply this
+		eightfilter.setIdfilter((short)1);
 		eightfilter.setCommand("8-bit");
-		eightfilter.setCommandoptions("");
+		eightfilter.setOptions("");
 		filters.add(eightfilter);
-		sample.setSamplefilterList(filters);
+		sample.setFilterList(filters);
 
 		setResizable(false);
 		this.parent = parent;
@@ -163,7 +160,7 @@ public class AddSampleJDialog extends JDialog
 		segmentationpn.add(fillchb, FluoJUtils.getConstraints(constraints, 1, 2, 1));
 
 		segmentationpn.add(new JLabel("Separate:"), FluoJUtils.getConstraints(constraints, 0, 3, 1));
-		separations = ConfigurationDB.getSeparations(parent.getEntityManager());
+		separations = ConfigurationDB.getIdseparations(parent.getEntityManager());
 		separationscb = new JComboBox(separations.toArray());
 		separationscb.setSelectedItem(separations.get(2));//none separation
 		segmentationpn.add(separationscb, FluoJUtils.getConstraints(constraints, 1, 3, 1));
@@ -232,15 +229,15 @@ public class AddSampleJDialog extends JDialog
 
 					sample.setName(name);
 
-					int threshold = ((Number) thresholdtf.getValue()).intValue();
-					sample.setThreshold(threshold);
+					short threshold = ((Number) thresholdtf.getValue()).shortValue();
+					sample.setImageThreshold(threshold);
 
-					Integer roisthreshold = (roisthresholdtf.getValue() != null)? ((Number) roisthresholdtf.getValue()).intValue(): null;
-					sample.setRoisthreshold(roisthreshold);
-					sample.setRoismax(((Number) roismaxtf.getValue()).intValue());
-					sample.setFillholes((fillchb.isSelected()) ? 1 : 0);
-					sample.setSeparation((Separation) separationscb.getSelectedItem());
-					sample.setExpansionradius(((Number) expansionradiustf.getValue()).intValue());
+					Short roisthreshold = (roisthresholdtf.getValue() != null)? ((Number) roisthresholdtf.getValue()).shortValue(): null;
+					sample.setRoisThreshold(roisthreshold);
+					sample.setRoisThreshold(((Number) roismaxtf.getValue()).shortValue());
+					sample.setFillHoles((fillchb.isSelected()));
+					sample.setIdseparation((Separation) separationscb.getSelectedItem());
+					sample.setExpansionRadius(((Number) expansionradiustf.getValue()).shortValue());
 					AddSampleJDialog.this.parent.addSample(sample, imp);
 
 				}

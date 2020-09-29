@@ -91,7 +91,7 @@ public class ComparisonJFrame extends JFrame
 		constraints.anchor = GridBagConstraints.WEST;
 		JPanel sessionpane = new JPanel();
 		sessionpane.add(new JLabel(String.format("Sample:%s", sample)));
-		sessionpane.add(new JLabel(String.format("Session:%s", classifier.getSession())));
+		sessionpane.add(new JLabel(String.format("Session:%s", classifier.getIdsession())));
 		add(sessionpane, constraints);
 		constraints.gridy = 1;
 		JPanel pane = new JPanel();

@@ -130,10 +130,10 @@ public class AddSampleTypeJDialog extends JDialog {
 				com.nbis.fluoj.persistence.Type t = new com.nbis.fluoj.persistence.Type();
 				t.setName(name);
 				t.setLabel(label);
-				t.setSample(AddSampleTypeJDialog.this.parent.getSample());
+				t.setIdsample(AddSampleTypeJDialog.this.parent.getSample());
 				t.setColor(color.getRGB());
 				int trainingmin = ((Number) tmintf.getValue()).intValue();
-				t.setTrainingmin(trainingmin);
+				t.setTrainingMin(trainingmin);
 				try
 				{
 					AddSampleTypeJDialog.this.parent.addType(t);

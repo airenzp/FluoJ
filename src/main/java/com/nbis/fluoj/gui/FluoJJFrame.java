@@ -30,7 +30,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
@@ -184,7 +184,7 @@ public abstract class FluoJJFrame extends JFrame
 					try
 					{
 						CellProcessor sc = new CellProcessor(sample);
-						for (Samplefeature sf : getSample().getSamplefeatureList())
+						for (SampleFeature sf : getSample().getSampleFeatureList())
 							sc.exportHistograms(sf, fc.getSelectedFile().getAbsolutePath(), em);
 
 					}

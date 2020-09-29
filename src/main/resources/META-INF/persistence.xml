@@ -14,6 +14,36 @@
     <class>com.nbis.fluoj.entities.Feature</class>
     <class>com.nbis.fluoj.entities.SampleFeature</class>
     <class>com.nbis.fluoj.entities.Sample</class>
+    <class>com.nbis.fluoj.persistence.SampleFeature_1</class>
+    <class>com.nbis.fluoj.persistence.Feature_1</class>
+    <class>com.nbis.fluoj.persistence.Sample_1</class>
+    <class>com.nbis.fluoj.persistence.Cell</class>
+    <class>com.nbis.fluoj.persistence.Image</class>
+    <class>com.nbis.fluoj.persistence.Sample</class>
+    <class>com.nbis.fluoj.persistence.CellFeature</class>
+    <class>com.nbis.fluoj.persistence.Probability</class>
+    <class>com.nbis.fluoj.persistence.ScellFeature</class>
+    <class>com.nbis.fluoj.persistence.SampleFeature</class>
+    <class>com.nbis.fluoj.persistence.Filter</class>
+    <class>com.nbis.fluoj.persistence.Feature</class>
+    <class>com.nbis.fluoj.persistence.CellType</class>
+    <class>com.nbis.fluoj.persistence.Scell</class>
+    <class>com.nbis.fluoj.persistence.Session</class>
+    <class>com.nbis.fluoj.gui.Scell</class>
+    <class>com.nbis.fluoj.gui.CellFeature</class>
+    <class>com.nbis.fluoj.gui.Cell</class>
+    <class>com.nbis.fluoj.gui.Filter</class>
+    <class>com.nbis.fluoj.gui.CellType</class>
+    <class>com.nbis.fluoj.gui.SampleImage</class>
+    <class>com.nbis.fluoj.gui.Session</class>
+    <class>com.nbis.fluoj.gui.Sample</class>
+    <class>com.nbis.fluoj.gui.SampleFeature</class>
+    <class>com.nbis.fluoj.gui.ScellFeature</class>
+    <class>com.nbis.fluoj.gui.Probability</class>
+    <class>com.nbis.fluoj.gui.Feature</class>
+    <class>com.nbis.fluoj.persistence.SampleImage</class>
+    <class>com.nbis.fluoj.persistence.Type</class>
+    <class>com.nbis.fluoj.persistence.Separation</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/fluoj"/>
       <property name="javax.persistence.jdbc.user" value="fluoj"/>

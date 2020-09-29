@@ -42,7 +42,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.CellInfo;
@@ -158,10 +158,10 @@ public class ImageParticlesTableJDialog extends JDialog {
 
 	class ImageLabelsTableModel extends AbstractTableModel {
 
-		private List<Samplefeature> sfeatures;
+		private List<SampleFeature> sfeatures;
 
 		public ImageLabelsTableModel() {
-			sfeatures = frame.getSample().getSamplefeatureList();
+			sfeatures = frame.getSample().getSampleFeatureList();
 		}
 
 		public void exportData(String dir) throws IOException {
@@ -222,7 +222,7 @@ public class ImageParticlesTableJDialog extends JDialog {
 				return "Y";
 			if (index == 3)
 				return "X";
-			return sfeatures.get(index - 4).getFeature().getFeature();
+			return sfeatures.get(index - 4).getFeature().getName();
 		}
 
 		@Override

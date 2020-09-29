@@ -25,11 +25,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import com.nbis.fluoj.persistence.*;
+import com.nbis.fluoj.persistence.Sample;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.Classifier;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
+import com.nbis.fluoj.persistence.Scell;
 
 /**
  * Displays {@link classifier.Sample} info filtered by {@link persistence.Type}
@@ -50,8 +52,8 @@ public class ViewJFrame extends OutputJFrame
 	private JButton cells_infobt;
 	private JButton editbt;
 	private int idimage = -1;
-	private Integer original;
-	private Integer winner;
+	private Short original;
+	private Short winner;
 	private CTableJFrame tablefr;
 	private ImageWindow iw;
 	private List<Scell> scells;
@@ -155,7 +157,7 @@ public class ViewJFrame extends OutputJFrame
 		originalcb = new JComboBox();
 		winnercb = new JComboBox();
 		samplecb.setSelectedItem(newclassifier.getSample());
-		setSample(newclassifier);
+		setIdsample(newclassifier);
 
 		samplecb.addActionListener(new ActionListener()
 		{
@@ -166,7 +168,7 @@ public class ViewJFrame extends OutputJFrame
 
 				try
 				{
-					setSample(ConfigurationDB.getInstance().getPersistentClassifier((Sample) samplecb.getSelectedItem()));
+					setIdsample(ConfigurationDB.getInstance().getPersistentClassifier((Sample) samplecb.getSelectedItem()));
 				}
 				catch (InvalidOperationOnResourceException e1)
 				{
@@ -183,7 +185,7 @@ public class ViewJFrame extends OutputJFrame
 			public void actionPerformed(ActionEvent e)
 			{
 
-				Imageresource ir = (Imageresource) imagecb.getSelectedItem();
+				SampleImage ir = (SampleImage) imagecb.getSelectedItem();
 				idimage = ir.getIdimage();
 				scells = classifier.getScells(idimage, em);
 			}
@@ -324,7 +326,7 @@ public class ViewJFrame extends OutputJFrame
 				try
 				{
 
-					new ReviewJFrame(classifier, getImageresource());
+					new ReviewJFrame(classifier, getSampleImage());
 				}
 				catch (Exception e)
 				{
@@ -357,7 +359,7 @@ public class ViewJFrame extends OutputJFrame
 		});
 	}
 
-	private void setSample(Classifier newclassifier) throws InvalidOperationOnResourceException
+	private void setIdsample(Classifier newclassifier) throws InvalidOperationOnResourceException
 	{
 		Sample newsample = newclassifier.getSample();
 		validateImagesCount(newclassifier, em);
@@ -366,13 +368,15 @@ public class ViewJFrame extends OutputJFrame
 		classifier = newclassifier;
 		sample = newsample;
 		imagecb.setModel(new DefaultComboBoxModel(classifier.getImages(em).toArray()));
-		Imageresource ir = (Imageresource) imagecb.getSelectedItem();
+		SampleImage ir = (SampleImage) imagecb.getSelectedItem();
 		idimage = ir.getIdimage();
 		this.scells = classifier.getScells(idimage, em);
 		List<com.nbis.fluoj.persistence.Type> types = new ArrayList<com.nbis.fluoj.persistence.Type>(classifier.getSample().getTypeList());
-		com.nbis.fluoj.persistence.Type unknown = new com.nbis.fluoj.persistence.Type(null, "None");
+		com.nbis.fluoj.persistence.Type unknown = new com.nbis.fluoj.persistence.Type(null);
+                unknown.setName("None");
 		types.add(unknown);
-		com.nbis.fluoj.persistence.Type all = new com.nbis.fluoj.persistence.Type(0, "Any");
+		com.nbis.fluoj.persistence.Type all = new com.nbis.fluoj.persistence.Type((short)0);
+                all.setName("Any");
 		types.add(0, all);
 		originalcb.setModel(new DefaultComboBoxModel(types.toArray()));
 		winnercb.setModel(new DefaultComboBoxModel(types.toArray()));
@@ -391,14 +395,14 @@ public class ViewJFrame extends OutputJFrame
 		setLocation(x, y);
 	}
 
-	public Imageresource getImageresource()
+	public SampleImage getSampleImage()
 	{
-		return (Imageresource) imagecb.getSelectedItem();
+		return (SampleImage) imagecb.getSelectedItem();
 	}
 
 	public void showImageResults() throws InvalidOperationOnResourceException
 	{
-		Imageresource ir = (Imageresource) imagecb.getSelectedItem();
+		SampleImage ir = (SampleImage) imagecb.getSelectedItem();
 		cip = new FluoJImageProcessor(ir.getImagePlus(), sample, true);
 		canvas = new OutputImageCanvas(this);
 		canvas.reload(classifier.getScells(ir.getIdimage(), original, winner, em));

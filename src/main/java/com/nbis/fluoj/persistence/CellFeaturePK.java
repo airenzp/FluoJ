@@ -1,5 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
@@ -14,42 +15,43 @@ import javax.persistence.Embeddable;
  * @author airen
  */
 @Embeddable
-public class SamplecorefeaturePK implements Serializable {
-    @Basic(optional = false)
-    @Column(name = "IDSAMPLE")
-    private int idsample;
-    @Basic(optional = false)
-    @Column(name = "IDFEATURE")
-    private int idfeature;
+public class CellFeaturePK implements Serializable {
 
-    public SamplecorefeaturePK() {
+    @Basic(optional = false)
+    @Column(name = "idcell", nullable = false)
+    private int idcell;
+    @Basic(optional = false)
+    @Column(name = "idfeature", nullable = false)
+    private short idfeature;
+
+    public CellFeaturePK() {
     }
 
-    public SamplecorefeaturePK(int idsample, int idfeature) {
-        this.idsample = idsample;
+    public CellFeaturePK(int idcell, short idfeature) {
+        this.idcell = idcell;
         this.idfeature = idfeature;
     }
 
-    public int getIdsample() {
-        return idsample;
+    public int getIdcell() {
+        return idcell;
     }
 
-    public void setIdsample(int idsample) {
-        this.idsample = idsample;
+    public void setIdcell(int idcell) {
+        this.idcell = idcell;
     }
 
-    public int getIdfeature() {
+    public short getIdfeature() {
         return idfeature;
     }
 
-    public void setIdfeature(int idfeature) {
+    public void setIdfeature(short idfeature) {
         this.idfeature = idfeature;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) idsample;
+        hash += (int) idcell;
         hash += (int) idfeature;
         return hash;
     }
@@ -57,11 +59,11 @@ public class SamplecorefeaturePK implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SamplecorefeaturePK)) {
+        if (!(object instanceof CellFeaturePK)) {
             return false;
         }
-        SamplecorefeaturePK other = (SamplecorefeaturePK) object;
-        if (this.idsample != other.idsample) {
+        CellFeaturePK other = (CellFeaturePK) object;
+        if (this.idcell != other.idcell) {
             return false;
         }
         if (this.idfeature != other.idfeature) {
@@ -72,7 +74,7 @@ public class SamplecorefeaturePK implements Serializable {
 
     @Override
     public String toString() {
-        return "persistence.SamplecorefeaturePK[ idsample=" + idsample + ", idfeature=" + idfeature + " ]";
+        return "com.nbis.fluoj.persistence.CellFeaturePK[ idcell=" + idcell + ", idfeature=" + idfeature + " ]";
     }
     
 }

@@ -15,7 +15,7 @@ import javax.persistence.Persistence;
 import javax.swing.JOptionPane;
 
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Imageresource;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
@@ -30,7 +30,7 @@ import com.nbis.fluoj.persistence.Type;
  */
 public abstract class DB {
 
-	public static final String pu = "ClassifierPU";
+	public static final String pu = "com.nbis_FluoJ2_jar_1.0-SNAPSHOTPU"; //"ClassifierPU";
 	private static EntityManagerFactory emf = null;
 	private static Cleaner cleaner;
 
@@ -77,16 +77,16 @@ public abstract class DB {
 		return null;
 	}
 
-	// Imageresource////////////////////////////////////////////////
+	// Image////////////////////////////////////////////////
 
-	public Imageresource saveImageResource(ImagePlus img, EntityManager em) {
+	public SampleImage saveImageResource(ImagePlus img, EntityManager em) {
 		if (img == null) throw new IllegalArgumentException(Constants.getEmptyFieldMsg("image"));
 		String dir;
-		Imageresource ir = null;
+		SampleImage ir = null;
 		FileSaver saver = new FileSaver(img);
 		try {
 			em.getTransaction().begin();
-			ir = new Imageresource();
+			ir = new SampleImage();
 			em.persist(ir);
 			em.flush();
 			ir.setName(ir.getIdimage() + ".tif");
@@ -124,20 +124,20 @@ public abstract class DB {
 			em.createQuery("delete from Session s where (s.date <= :date or s.date is null) and (s.sample.session is null or not (s.sample.session.idsession = s.idsession))")
 					.setParameter("date", date).executeUpdate();
 			//takes active sessions images for any sample on Scells
-			String noactiveimages =  " and ir.idimage not in (select ss.imageresource.idimage from Scell ss where ss.session.idsession in "
+			String noactiveimages =  " and ir.idimage not in (select ss.sample_image.idimage from Scell ss where ss.session.idsession in "
 					+ "(Select sa.session.idsession from Sample sa where sa.session.idsession is not null) ) ";
 
 			//excludes sample image and cells images
-			String norefimages =  " and ir.idimage not in (select c.imageresource.idimage from Cell c) " +
-									 "and ir.idimage not in (select s.imageresource.idimage from Sample s)";
+			String norefimages =  " and ir.idimage not in (select c.sample_image.idimage from Cell c) " +
+									 "and ir.idimage not in (select s.sample_image.idimage from Sample s)";
 
-			List<Imageresource> irs = em.createQuery("select ir from Imageresource ir where ir.date <= :date" + noactiveimages
+			List<SampleImage> irs = em.createQuery("select ir from Image ir where ir.date <= :date" + noactiveimages
 							+  norefimages).setParameter("date", date).getResultList();
-			Imageresource ir;
+			SampleImage ir;
 			String file;
 			for (int i = 0; i < irs.size(); i++) {
 				ir = irs.get(i);
-				file = ir.getPath();
+				file = ConfigurationDB.getPath(ir);
 				System.out.println(file);
 				new File(file).delete();
 				em.remove(ir);
@@ -149,5 +149,6 @@ public abstract class DB {
 			throw new CDBException(e.getMessage());
 		}
 	}
-
+        
+       
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -74,7 +74,7 @@ public class SampleFeaturePK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.SampleFeaturePK[ idsample=" + idsample + ", idfeature=" + idfeature + " ]";
+        return "com.nbis.fluoj.persistence.SampleFeaturePK[ idsample=" + idsample + ", idfeature=" + idfeature + " ]";
     }
     
 }

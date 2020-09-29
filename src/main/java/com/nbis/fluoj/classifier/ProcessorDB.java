@@ -14,15 +14,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import com.nbis.fluoj.persistence.Cell;
-import com.nbis.fluoj.persistence.Cellfeature;
-import com.nbis.fluoj.persistence.CellfeaturePK;
+import com.nbis.fluoj.persistence.CellFeature;
+import com.nbis.fluoj.persistence.CellFeaturePK;
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Ftprobability;
-import com.nbis.fluoj.persistence.Imageresource;
+import com.nbis.fluoj.persistence.Probability;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
-import com.nbis.fluoj.persistence.Scellfeature;
+import com.nbis.fluoj.persistence.ScellFeature;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
 
@@ -84,7 +84,7 @@ public class ProcessorDB extends DB {
 	public void importTrainingData(Session session, EntityManager em) {
 		em.getTransaction().begin();
 		try {
-			em.createQuery("delete from Cell c where c.sample.idsample = :idsample").setParameter("idsample", session.getSample().getIdsample()).executeUpdate();
+			em.createQuery("delete from Cell c where c.sample_image.sample.idsample = :idsample").setParameter("idsample", session.getIdsample().getIdsample()).executeUpdate();
 			if (session == null) {
 				em.getTransaction().commit();
 				return;
@@ -96,32 +96,31 @@ public class ProcessorDB extends DB {
 					.getResultList();
 			Scell sc;
 			Cell c;
-			Cellfeature cf;
-			Scellfeature ssf;
-			Iterator<Scellfeature> iter;
+			CellFeature cf;
+			ScellFeature ssf;
+			Iterator<ScellFeature> iter;
 			for (int i = 0; i < list.size(); i++) {
 				sc = list.get(i);
-				if (sc.getType() == null)
+				if (sc.getIdtype() == null)
 					continue;
 				c = new Cell();
 				c.setDate(new Date());
-				c.setImageresource(em.find(Imageresource.class, sc
-						.getImageresource().getIdimage()));
-				c.setType(em.find(Type.class, sc.getType().getIdtype()));
-				c.setXPosition(sc.getXPosition());
-				c.setYPosition(sc.getYPosition());
-				c.setSample(sample);
+				c.setIdimage(em.find(SampleImage.class, sc
+						.getIdimage().getIdimage()));
+				c.setIdtype(em.find(Type.class, sc.getIdtype().getIdtype()));
+				c.setX(sc.getX());
+				c.setY(sc.getY());
 				em.persist(c);
 				em.flush();
 				if (i % 20 == 0)
 					em.clear();
-				iter = sc.getScellfeatureList().iterator();
+				iter = sc.getScellFeatureList().iterator();
 				while (iter.hasNext()) {
 					ssf = iter.next();
 					if(!useOnClassification(ssf.getFeature()))
 						continue;
-					cf = new Cellfeature();
-					cf.setCellfeaturePK(new CellfeaturePK(c.getIdcell(), ssf
+					cf = new CellFeature();
+					cf.setCellFeaturePK(new CellFeaturePK(c.getIdcell(), ssf
 							.getFeature().getIdfeature()));
 					cf.setValue(ssf.getValue());
 					em.persist(cf);
@@ -138,8 +137,8 @@ public class ProcessorDB extends DB {
 	}
 
 	private boolean useOnClassification(Feature feature) {
-		for(Samplefeature sf: sample.getSamplefeatureList())
-			if(sf.getFeature().equals(feature) && sf.getUseonclassification() == 1)
+		for(SampleFeature sf: sample.getSampleFeatureList())
+			if(sf.getFeature().equals(feature) && sf.getActive())
 				return true;
 		
 		return false;
@@ -147,12 +146,12 @@ public class ProcessorDB extends DB {
 
 	// Featureontypeprobability///////////////////////////////////////////////////
 
-	public List<Ftprobability> getProbabilities(int idtype, int idfeature,
+	public List<Probability> getProbabilities(int idtype, int idfeature,
 			EntityManager em) {
 		try {
 			return em
 					.createQuery(
-							"select ftp from Ftprobability ftp where ftp.type.idtype = :idtype and ftp.feature.idfeature = :idfeature order by ftp.x")
+							"select ftp from Probability ftp where ftp.type.idtype = :idtype and ftp.feature.idfeature = :idfeature order by ftp.x")
 					.setParameter("idtype", idtype)
 					.setParameter("idfeature", idfeature).getResultList();
 
@@ -162,9 +161,9 @@ public class ProcessorDB extends DB {
 		}
 	}
 
-	public List<Ftprobability> initializeHistogram(Type type, Feature feature, EntityManager em) {
+	public List<Probability> initializeHistogram(Type type, Feature feature, EntityManager em) {
 		try {
-			List<Ftprobability> ftps = new ArrayList<Ftprobability>();
+			List<Probability> ftps = new ArrayList<Probability>();
 			Double min = ConfigurationDB.getMinForFeatureOnSample(
 					sample.getIdsample(), feature.getIdfeature(), em);
 			if (min == null)
@@ -172,7 +171,7 @@ public class ProcessorDB extends DB {
 			Double max = ConfigurationDB.getMaxForFeatureOnSample(
 					sample.getIdsample(), feature.getIdfeature(), em);
 			String query = "select floor((cf.value - ?)/?) as x, count(*) as freq "
-					+ "from cellfeature cf inner join samplefeature sf on cf.idfeature = sf.idfeature inner join cell c on c.idcell = cf.idcell "
+					+ "from cellfeature cf inner join SampleFeature sf on cf.idfeature = sf.idfeature inner join cell c on c.idcell = cf.idcell "
 					+ "where cf.idfeature = ? and c.class = ? "
 					+ "group by x "
 					+ "order by x";
@@ -183,17 +182,17 @@ public class ProcessorDB extends DB {
 					.setParameter(2, scale).setParameter(3, idfeature)
 					.setParameter(4, idtype).getResultList();
 
-			Ftprobability ftp;
+			Probability ftp;
 			Object[] item;
 			Integer x, freq;
-			// System.out.println(String.format("%s, %s %s %s", type.getType(),
+			// System.out.println(String.format("%s, %s %s %s", type.getIdtype(),
 			// feature.getFeature(), feature.getMin(), feature.getMax()));
 			for (int k = 0; k < result.size(); k++) {
 
 				item = (Object[]) result.get(k);
 				x = ((Double) item[0]).intValue();
 				freq = ((Long) item[1]).intValue();
-				ftp = new Ftprobability();
+				ftp = new Probability();
 				ftp.setFeature(feature);
 				ftp.setType(type);
 				ftp.setX(x);
@@ -211,12 +210,12 @@ public class ProcessorDB extends DB {
 	public void deleteProbabilities(EntityManager em) {
 		try {
 			em.getTransaction().begin();
-			List<Ftprobability> ftps = em
+			List<Probability> ftps = em
 					.createQuery(
-							"select ftp from Ftprobability ftp where ftp.type.sample.idsample = :idsample")
+							"select ftp from Probability ftp where ftp.type.sample.idsample = :idsample")
 					.setParameter("idsample", sample.getIdsample())
 					.getResultList();
-			for (Ftprobability ftp : ftps)
+			for (Probability ftp : ftps)
 				em.remove(ftp);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -231,7 +230,7 @@ public class ProcessorDB extends DB {
 	{
 		try
 		{
-			List<Object[]> results = em.createQuery( "select ftp.x, ftp.probability from Ftprobability ftp " +
+			List<Object[]> results = em.createQuery( "select ftp.x, ftp.probability from Probability ftp " +
 											"where ftp.type.idtype = :idtype and ftp.feature.idfeature = :idfeature " +
 											"order by ftp.x").
 											setParameter("idtype", idtype).

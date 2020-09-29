@@ -19,13 +19,13 @@ import java.util.logging.Level;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Ftprobability;
-import com.nbis.fluoj.persistence.Imageresource;
+import com.nbis.fluoj.classifier.CellTypeProbability;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
-import com.nbis.fluoj.persistence.Scellfeature;
-import com.nbis.fluoj.persistence.ScellfeaturePK;
+import com.nbis.fluoj.persistence.ScellFeature;
+import com.nbis.fluoj.persistence.ScellFeaturePK;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
 
@@ -63,9 +63,9 @@ public class ClassifierDB extends DB
 																										// feature
 																										// value
 
-	private String probFromNQuery = "scellfeature ssf inner join scell ss on ssf.idscell = ss.idscell inner join session s on ss.idsession = s.idsession inner join type t on t.idsample = s.idsample inner join samplefeature f on ssf.idfeature  = f.idfeature and f.idsample = s.idsample inner join ftprobability ftp on f.idfeature = ftp.idfeature and t.idtype = ftp.idtype";
+	private String probFromNQuery = "ScellFeature ssf inner join scell ss on ssf.idscell = ss.idscell inner join session s on ss.idsession = s.idsession inner join type t on t.idsample = s.idsample inner join SampleFeature f on ssf.idfeature  = f.idfeature and f.idsample = s.idsample inner join ftprobability ftp on f.idfeature = ftp.idfeature and t.idtype = ftp.idtype";
 
-	private String probFeatureRestrictionNQuery = "count(f.idfeature) = (select count(*) from samplefeature sf where sf.idsample = ? and useonclassification = 1 )";
+	private String probFeatureRestrictionNQuery = "count(f.idfeature) = (select count(*) from SampleFeature sf where sf.idsample = ? and useonclassification = 1 )";
 
 	private String probNQuery = String
 			.format("select ssf.idscell, ftp.idtype, %s from %s where %s and ss.idsession = ?  group by ssf.idscell, ftp.idtype having %s order by idscell", probColumnNQuery, probFromNQuery, probXRestrictionNQuery, probFeatureRestrictionNQuery);
@@ -81,17 +81,17 @@ public class ClassifierDB extends DB
 
 	private String scellsOnSessionQuery = "select ss from Scell ss where ss.session.idsession = :idsession";
 
-	private String scellsOnImageQuery = "select ss from Scell ss where ss.session.idsession = :idsession and ss.imageresource.idimage = :idimage";
+	private String scellsOnImageQuery = "select ss from Scell ss where ss.session.idsession = :idsession and ss.sample_image.idimage = :idimage";
 
-	private String scellsOnImageOriginalNullWinnerNullQuery = "select s from Scell s where s.type is null and s.type1 is null and s.session.idsession = :idsession and s.imageresource.idimage = :idimage";
+	private String scellsOnImageOriginalNullWinnerNullQuery = "select s from Scell s where s.type is null and s.type1 is null and s.session.idsession = :idsession and s.sample_image.idimage = :idimage";
 
-	private String scellsOnImageOriginalNullWinnerAnyQuery = "select s from Scell s where s.type is null and s.session.idsession = :idsession and s.imageresource.idimage = :idimage";
+	private String scellsOnImageOriginalNullWinnerAnyQuery = "select s from Scell s where s.type is null and s.session.idsession = :idsession and s.sample_image.idimage = :idimage";
 
-	private String scellsOnImageOriginalAnyWinnerNullQuery = "select s from Scell s where s.type1 is null and s.session.idsession = :idsession and s.imageresource.idimage = :idimage";
+	private String scellsOnImageOriginalAnyWinnerNullQuery = "select s from Scell s where s.type1 is null and s.session.idsession = :idsession and s.sample_image.idimage = :idimage";
 
-	private String scellsOnImageOriginalNullWinnerQuery = "select s from Scell s where s.type is null and s.type1.idtype = :winner and s.session.idsession = :idsession and s.imageresource.idimage = :idimage";
+	private String scellsOnImageOriginalNullWinnerQuery = "select s from Scell s where s.type is null and s.type1.idtype = :winner and s.session.idsession = :idsession and s.sample_image.idimage = :idimage";
 
-	private String scellsOnImageOriginalWinnerNullQuery = "select s from Scell s where s.type1 is null and s.type.idtype = :original and s.session.idsession = :idsession and s.imageresource.idimage = :idimage";
+	private String scellsOnImageOriginalWinnerNullQuery = "select s from Scell s where s.type1 is null and s.type.idtype = :original and s.session.idsession = :idsession and s.sample_image.idimage = :idimage";
 
 	public ClassifierDB(Sample sample, String name, Date date, EntityManager em)
 	{
@@ -119,7 +119,7 @@ public class ClassifierDB extends DB
 		session = em.find(Session.class, idsession);
 		if (session == null)
 			throw new InvalidOperationOnResourceException("No such session:" + idsession);
-		this.sample = session.getSample();
+		this.sample = session.getIdsample();
 		removeSessionDataBeforeDate(ConfigurationDB.limitDateForData());
 		em.close();
 	}
@@ -129,7 +129,7 @@ public class ClassifierDB extends DB
 
 		if (session == null)
 			throw new IllegalArgumentException("No such session:");
-		this.sample = session.getSample();
+		this.sample = session.getIdsample();
 		this.session = session;
 		removeSessionDataBeforeDate(ConfigurationDB.limitDateForData());
 	}
@@ -148,13 +148,13 @@ public class ClassifierDB extends DB
 
 			session = new Session();
 			session.setDate(date);
-			session.setSample(sample);
+			session.setIdsample(sample);
 			session.setName(name);
 			em.persist(session);
 			em.flush();// take this changes to database now, session is updated
 						// with generated id
 			em.refresh(session);
-			sample.setSession(session);
+			sample.setIdsession(session);
 			// em.merge(sample);
 			em.getTransaction().commit();
 		}
@@ -200,7 +200,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public List<Scell> getScellsOnImage(int idimage, Integer original, Integer winner, EntityManager em)
+	public List<Scell> getScellsOnImage(int idimage, Short original, Short winner, EntityManager em)
 	{
 		try
 		{
@@ -227,17 +227,17 @@ public class ClassifierDB extends DB
 				return getScellsOnImage(idimage, em);
 			if (original == 0)
 				return em
-						.createQuery("select s from Scell s where s.type1.idtype = :winner and s.session.idsession = :idsession  and s.imageresource.idimage = :idimage")
+						.createQuery("select s from Scell s where s.type1.idtype = :winner and s.session.idsession = :idsession  and s.sample_image.idimage = :idimage")
 						.setParameter("idsession", session.getIdsession()).setParameter("winner", winner).setParameter("idimage", idimage)
 						.getResultList();
 			if (winner == 0)
 				return em
-						.createQuery("select s from Scell s where s.type.idtype = :original and s.session.idsession = :idsession  and s.imageresource.idimage = :idimage")
+						.createQuery("select s from Scell s where s.type.idtype = :original and s.session.idsession = :idsession  and s.sample_image.idimage = :idimage")
 						.setParameter("idsession", session.getIdsession()).setParameter("original", original).setParameter("idimage", idimage)
 						.getResultList();
 
 			return em
-					.createQuery("select s from Scell s where s.type.idtype = :original and s.type1.idtype = :winner and s.session.idsession = :idsession  and s.imageresource.idimage = :idimage")
+					.createQuery("select s from Scell s where s.type.idtype = :original and s.type1.idtype = :winner and s.session.idsession = :idsession  and s.sample_image.idimage = :idimage")
 					.setParameter("idsession", session.getIdsession()).setParameter("original", original).setParameter("winner", winner)
 					.setParameter("idimage", idimage).getResultList();
 		}
@@ -305,7 +305,7 @@ public class ClassifierDB extends DB
 		try
 		{
 			List<Object[]> result = em.createNativeQuery(probOnImageNQuery).setParameter(1, CellProcessor.marks)
-					.setParameter(2, session.getIdsession().intValue()).setParameter(3, idimage).setParameter(4, session.getSample().getIdsample())
+					.setParameter(2, session.getIdsession().intValue()).setParameter(3, idimage).setParameter(4, session.getIdsample().getIdsample())
 					.getResultList();
 			return result;
 
@@ -331,7 +331,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public Integer getScellTotalForClass(Integer idtype, EntityManager em)
+	public Integer getScellTotalForClass(Short idtype, EntityManager em)
 	{
 		try
 		{
@@ -350,7 +350,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public Integer getScellTotalForWinner(Integer idtype, EntityManager em)
+	public Integer getScellTotalForWinner(Short idtype, EntityManager em)
 	{
 		try
 		{
@@ -369,7 +369,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public int getScellTotal(Integer original, Integer winner)
+	public int getScellTotal(Short original, Short winner)
 	{
 		try
 		{
@@ -417,7 +417,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public float getWinnerPercent(int idtype, EntityManager em)
+	public float getWinnerPercent(short idtype, EntityManager em)
 	{
 		try
 		{
@@ -432,7 +432,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public float getWinnerErrorPercent(int idtype, EntityManager em)
+	public float getWinnerErrorPercent(Short idtype, EntityManager em)
 	{
 		try
 		{
@@ -458,7 +458,7 @@ public class ClassifierDB extends DB
 
 	public void persistScells(List<Scell> scells, EntityManager em)
 	{
-		List<Scellfeature> ssfs;
+		List<ScellFeature> ssfs;
 		Scell ss;
 		try
 		{
@@ -466,12 +466,12 @@ public class ClassifierDB extends DB
 			for (int i = 0; i < scells.size(); i++)
 			{
 				ss = scells.get(i);
-				ss.setSession(session);
+				ss.setIdsession(session);
 				ss.setDate(new Date());
-				ssfs = ss.getScellfeatureList();
-				ss.setScellfeatureList(null);
-				if (ss.getType() != null)
-					ss.setType(em.find(Type.class, ss.getType().getIdtype()));// to
+				ssfs = ss.getScellFeatureList();
+				ss.setScellFeatureList(null);
+				if (ss.getIdtype() != null)
+					ss.setIdtype(em.find(Type.class, ss.getIdtype().getIdtype()));// to
 																				// avoid
 				// persistence try to insert value
 				em.persist(ss);
@@ -480,12 +480,12 @@ public class ClassifierDB extends DB
 				// Separation of persists because of api trouble with identity
 				// generation and child references
 				em.flush();
-				for (Scellfeature ssf : ssfs)
+				for (ScellFeature ssf : ssfs)
 				{
-					ssf.setScellfeaturePK(new ScellfeaturePK(ss.getIdscell(), ssf.getFeature().getIdfeature()));
+					ssf.setScellFeaturePK(new ScellFeaturePK(ss.getIdscell(), ssf.getFeature().getIdfeature()));
 					em.persist(ssf);
 				}
-				ss.setScellfeatureList(ssfs);
+				ss.setScellFeatureList(ssfs);
 			}
 			em.getTransaction().commit();
 			// em.flush();
@@ -503,7 +503,7 @@ public class ClassifierDB extends DB
 		{
 			// int features_total = getFeatureTotal(em);
 			Query q = em.createNativeQuery(probOnScellNQuery).setParameter(1, CellProcessor.marks).setParameter(2, idscell)
-					.setParameter(3, session.getSample().getIdsample());
+					.setParameter(3, session.getIdsample());
 			List result = q.getResultList();
 			Object[] item;
 			int idtype;
@@ -527,8 +527,6 @@ public class ClassifierDB extends DB
 	public String getId()
 	{
 		String id = "";
-		if (session.getWell() != null)
-			id += session.getWell() + "-";
 		if (session.getName() != null)
 			id += session.getName() + "-";
 		id += session.getDate().toString();
@@ -536,13 +534,13 @@ public class ClassifierDB extends DB
 
 	}
 
-	public List<Imageresource> getImages()
+	public List<SampleImage> getImages()
 	{
 		try
 		{
 			EntityManager em = getEM();
 			return em
-					.createQuery("select distinct(s.imageresource)  from Scell s where s.session.idsession = :idsession order by s.imageresource.name")
+					.createQuery("select distinct(s.sample_image)  from Scell s where s.session.idsession = :idsession order by s.sample_image.name")
 					.setParameter("idsession", session.getIdsession()).getResultList();
 		}
 		catch (Exception e)
@@ -556,7 +554,7 @@ public class ClassifierDB extends DB
 		try
 		{
 			return ((Long) em
-					.createQuery("select count(ir.idimage) from Imageresource ir where ir.idimage = some (select s.imageresource.idimage from Scell s where s.session.idsession = :idsession)")
+					.createQuery("select count(ir.idimage) from Image ir where ir.idimage = some (select s.sample_image.idimage from Scell s where s.session.idsession = :idsession)")
 					.setParameter("idsession", session.getIdsession()).getSingleResult()).intValue();
 		}
 		catch (Exception e)
@@ -565,7 +563,7 @@ public class ClassifierDB extends DB
 		}
 	}
 
-	public List<Integer> getSessions(EntityManager em)
+	public List<Integer> getIdsessions(EntityManager em)
 	{
 		try
 		{
@@ -635,7 +633,7 @@ public class ClassifierDB extends DB
 		try
 		{
 			List result = em
-					.createNativeQuery("select ss.winner, ssf.idfeature, count(*), sum(ssf.value), sum(power(ssf.value, 2)) from scellfeature ssf inner join scell sc on ssf.idscell = sc.idscell where sc.idsession = ? group by sc.winner, ssf.idfeature order by sc.winner, ssf.idfeature")
+					.createNativeQuery("select ss.winner, ssf.idfeature, count(*), sum(ssf.value), sum(power(ssf.value, 2)) from ScellFeature ssf inner join scell sc on ssf.idscell = sc.idscell where sc.idsession = ? group by sc.winner, ssf.idfeature order by sc.winner, ssf.idfeature")
 					.setParameter(1, session.getIdsession()).getResultList();
 			Object[] item;
 			CellStatistics scellstat;
@@ -674,7 +672,7 @@ public class ClassifierDB extends DB
 		try
 		{
 			Object result = em
-					.createQuery("select max(ssf.value) from Scellfeature ssf where ssf.scell.session.idsession = :idsession and ssf.feature.idfeature = :idfeature")
+					.createQuery("select max(ssf.value) from ScellFeature ssf where ssf.scell.session.idsession = :idsession and ssf.feature.idfeature = :idfeature")
 					.setParameter("idsession", session.getIdsession()).setParameter("idfeature", idfeature).getSingleResult();
 			if (result != null)
 				return (Double) result;
@@ -692,7 +690,7 @@ public class ClassifierDB extends DB
 		try
 		{
 			Object result = em
-					.createQuery("select min(ssf.value) from Scellfeature ssf where ssf.scell.session.idsession = :idsession and ssf.feature.idfeature = :idfeature")
+					.createQuery("select min(ssf.value) from ScellFeature ssf where ssf.scell.session.idsession = :idsession and ssf.feature.idfeature = :idfeature")
 					.setParameter("idsession", session.getIdsession()).setParameter("idfeature", idfeature).getSingleResult();
 			if (result != null)
 				return (Double) result;
@@ -706,10 +704,10 @@ public class ClassifierDB extends DB
 
 	public void exportAllData(File file, boolean original, boolean winner, boolean includeheader, EntityManager em)
 	{
-		exportAllData(file, false, sample.getSamplefeatureList(), original, winner, true, em);
+		exportAllData(file, false, sample.getSampleFeatureList(), original, winner, true, em);
 	}
 
-	public void exportAllData(File file, boolean scale, List<Samplefeature> sfeatures, boolean manual, boolean automatic, boolean includeheader, EntityManager em)
+	public void exportAllData(File file, boolean scale, List<SampleFeature> sfeatures, boolean manual, boolean automatic, boolean includeheader, EntityManager em)
 	{
 		try
 		{
@@ -725,7 +723,7 @@ public class ClassifierDB extends DB
 				for (int j = 0; j < sfeatures.size(); j++)
 				{
 					
-					column = sfeatures.get(j).getFeature().getFeature();
+					column = sfeatures.get(j).getFeature().getName();
 					if (column.length() >= 50)
 						column = column.substring(0, 46) + "...";
 					columns += String.format("%50s", column);
@@ -738,7 +736,7 @@ public class ClassifierDB extends DB
 			}
 			String line = "";
 			Scell s;
-			Scellfeature ssf;
+			ScellFeature ssf;
 			int scalemax = 3000;
 			Feature f;
 			double value;
@@ -763,9 +761,9 @@ public class ClassifierDB extends DB
 					line += String.format("%50d", i + 1);
 
 				for (int j = 0; j < sfeatures.size(); j++)
-					for (int k = 0; k < s.getScellfeatureList().size(); k++)
+					for (int k = 0; k < s.getScellFeatureList().size(); k++)
 					{
-						ssf = s.getScellfeatureList().get(k);
+						ssf = s.getScellFeatureList().get(k);
 						value = ssf.getValue();
 
 						if (sfeatures.get(j).getFeature().getIdfeature().equals(ssf.getFeature().getIdfeature()))
@@ -778,9 +776,9 @@ public class ClassifierDB extends DB
 					}
 
 				if (manual)
-					line += String.format("%50s", s.getType());
+					line += String.format("%50s", s.getIdtype());
 				if (automatic)
-					line += String.format("%50s", s.getType1());
+					line += String.format("%50s", s.getWinner());
 				writer.append(line);
 				writer.append(String.format("\n"));
 			}
@@ -794,7 +792,7 @@ public class ClassifierDB extends DB
 
 	public void exportToOpenDX(String directoryPath, boolean original, boolean winner, EntityManager em)
 	{
-		if (sample.getSamplefeatureList().size() < 4)
+		if (sample.getSampleFeatureList().size() < 4)
 			throw new IllegalArgumentException("Must have a minimum of 4 sample features");
 		try
 		{
@@ -809,10 +807,10 @@ public class ClassifierDB extends DB
 							.getIdsession(), getScellTotal());
 			writer.append(content);
 			writer.close();
-			List<Samplefeature> choosen = new ArrayList<Samplefeature>();
+			List<SampleFeature> choosen = new ArrayList<SampleFeature>();
 			int id;
 			for (int i = 0; i < 4; i++)
-				choosen.add(sample.getSamplefeatureList().get(i));
+				choosen.add(sample.getSampleFeatureList().get(i));
 			filepath = String.format("%s//%s.dat", directoryPath, session.getIdsession());
 			file = new File(filepath);
 			file.createNewFile();
@@ -835,30 +833,30 @@ public class ClassifierDB extends DB
 		return (Double) result.get(0);
 	}
 
-	public SimpleEntry<Double, Double>[] getHistogram(Samplefeature sfeature, EntityManager em)
+	public SimpleEntry<Double, Double>[] getHistogram(SampleFeature sfeature, EntityManager em)
 	{
 		try
 		{
 			List<Scell> scells = getScells(em);
 			SimpleEntry<Double, Double>[] histogram = new SimpleEntry[CellProcessor.marks];
-			Double min = ConfigurationDB.getMinForFeatureOnSampleSession(sfeature.getSample().getSession().getIdsession(), sfeature.getFeature().getIdfeature(), em);
+			Double min = ConfigurationDB.getMinForFeatureOnSampleSession(sfeature.getSample().getIdsession().getIdsession(), sfeature.getFeature().getIdfeature(), em);
 			if (min == null)
 				return histogram;
-			Double max = ConfigurationDB.getMaxForFeatureOnSampleSession(sfeature.getSample().getSession().getIdsession(), sfeature.getFeature().getIdfeature(), em);
+			Double max = ConfigurationDB.getMaxForFeatureOnSampleSession(sfeature.getSample().getIdsession().getIdsession(), sfeature.getFeature().getIdfeature(), em);
 
 			double scale = (max - min) / CellProcessor.marks;
 
 			Integer x;
 			Scell s;
-			Scellfeature scf;
+			ScellFeature scf;
 			double value;
 			SimpleEntry<Double, Double> bin;
 			for (int i = 0; i < scells.size(); i++)
 			{
 				s = scells.get(i);
-				for (int k = 0; k < s.getScellfeatureList().size(); k++)
+				for (int k = 0; k < s.getScellFeatureList().size(); k++)
 				{
-					scf = s.getScellfeatureList().get(k);
+					scf = s.getScellFeatureList().get(k);
 					if (scf.getFeature().equals(sfeature.getFeature()))
 					{
 						value = scf.getValue();

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -34,8 +34,8 @@ public class CellFeature implements Serializable {
     @EmbeddedId
     protected CellFeaturePK cellFeaturePK;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "value", precision = 8, scale = 8)
-    private Float value;
+    @Column(name = "value", precision = 17, scale = 17)
+    private Double value;
     @JoinColumn(name = "idcell", referencedColumnName = "idcell", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Cell cell;
@@ -62,11 +62,11 @@ public class CellFeature implements Serializable {
         this.cellFeaturePK = cellFeaturePK;
     }
 
-    public Float getValue() {
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(Float value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 
@@ -108,7 +108,7 @@ public class CellFeature implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.CellFeature[ cellFeaturePK=" + cellFeaturePK + " ]";
+        return "com.nbis.fluoj.persistence.CellFeature[ cellFeaturePK=" + cellFeaturePK + " ]";
     }
     
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -29,22 +29,19 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "SampleFeature.findByIdfeature", query = "SELECT s FROM SampleFeature s WHERE s.sampleFeaturePK.idfeature = :idfeature"),
     @NamedQuery(name = "SampleFeature.findByMin", query = "SELECT s FROM SampleFeature s WHERE s.min = :min"),
     @NamedQuery(name = "SampleFeature.findByMax", query = "SELECT s FROM SampleFeature s WHERE s.max = :max"),
-    @NamedQuery(name = "SampleFeature.findByActive", query = "SELECT s FROM SampleFeature s WHERE s.active = :active"),
-    @NamedQuery(name = "SampleFeature.findByInternal", query = "SELECT s FROM SampleFeature s WHERE s.internal = :internal")})
+    @NamedQuery(name = "SampleFeature.findByActive", query = "SELECT s FROM SampleFeature s WHERE s.active = :active")})
 public class SampleFeature implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected SampleFeaturePK sampleFeaturePK;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "min", precision = 8, scale = 8)
-    private Float min;
-    @Column(name = "max", precision = 8, scale = 8)
-    private Float max;
+    @Column(name = "min", precision = 17, scale = 17)
+    private Double min;
+    @Column(name = "max", precision = 17, scale = 17)
+    private Double max;
     @Column(name = "active")
     private Boolean active;
-    @Column(name = "internal")
-    private Boolean internal;
     @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Feature feature;
@@ -71,19 +68,19 @@ public class SampleFeature implements Serializable {
         this.sampleFeaturePK = sampleFeaturePK;
     }
 
-    public Float getMin() {
+    public Double getMin() {
         return min;
     }
 
-    public void setMin(Float min) {
+    public void setMin(Double min) {
         this.min = min;
     }
 
-    public Float getMax() {
+    public Double getMax() {
         return max;
     }
 
-    public void setMax(Float max) {
+    public void setMax(Double max) {
         this.max = max;
     }
 
@@ -93,14 +90,6 @@ public class SampleFeature implements Serializable {
 
     public void setActive(Boolean active) {
         this.active = active;
-    }
-
-    public Boolean getInternal() {
-        return internal;
-    }
-
-    public void setInternal(Boolean internal) {
-        this.internal = internal;
     }
 
     public Feature getFeature() {
@@ -141,7 +130,7 @@ public class SampleFeature implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.SampleFeature[ sampleFeaturePK=" + sampleFeaturePK + " ]";
+        return "com.nbis.fluoj.persistence.SampleFeature[ sampleFeaturePK=" + sampleFeaturePK + " ]";
     }
     
 }

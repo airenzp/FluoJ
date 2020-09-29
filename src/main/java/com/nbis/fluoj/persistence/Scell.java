@@ -1,5 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
@@ -11,8 +12,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -30,45 +29,42 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author airen
  */
 @Entity
-@Table(name = "SCELL")
+@Table(name = "scell")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Scell.findAll", query = "SELECT s FROM Scell s"),
     @NamedQuery(name = "Scell.findByIdscell", query = "SELECT s FROM Scell s WHERE s.idscell = :idscell"),
-    @NamedQuery(name = "Scell.findByXPosition", query = "SELECT s FROM Scell s WHERE s.xPosition = :xPosition"),
-    @NamedQuery(name = "Scell.findByYPosition", query = "SELECT s FROM Scell s WHERE s.yPosition = :yPosition"),
-    @NamedQuery(name = "Scell.findByDate", query = "SELECT s FROM Scell s WHERE s.date = :date"),
-    @NamedQuery(name = "Scell.findByValid", query = "SELECT s FROM Scell s WHERE s.valid = :valid")})
+    @NamedQuery(name = "Scell.findByX", query = "SELECT s FROM Scell s WHERE s.x = :x"),
+    @NamedQuery(name = "Scell.findByY", query = "SELECT s FROM Scell s WHERE s.y = :y"),
+    @NamedQuery(name = "Scell.findByDate", query = "SELECT s FROM Scell s WHERE s.date = :date")})
 public class Scell implements Serializable {
-    @Column(name =     "DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "IDSCELL")
+    @Column(name = "idscell", nullable = false)
     private Integer idscell;
-    @Column(name = "X_POSITION")
-    private Integer xPosition;
-    @Column(name = "Y_POSITION")
-    private Integer yPosition;
-    @Column(name = "VALID")
-    private Integer valid;
+    @Column(name = "x")
+    private Integer x;
+    @Column(name = "y")
+    private Integer y;
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private Date date;
+    @JoinColumn(name = "idimage", referencedColumnName = "idimage")
+    @ManyToOne
+    private SampleImage idimage;
+    @JoinColumn(name = "idsession", referencedColumnName = "idsession")
+    @ManyToOne
+    private Session idsession;
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype")
+    @ManyToOne
+    private Type idtype;
+    @JoinColumn(name = "winner", referencedColumnName = "idtype")
+    @ManyToOne
+    private Type winner;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scell")
-    private List<Scellfeature> scellfeatureList;
-    @JoinColumn(name = "CLASS", referencedColumnName = "IDTYPE")
-    @ManyToOne
-    private Type type;
-    @JoinColumn(name = "WINNER", referencedColumnName = "IDTYPE")
-    @ManyToOne
-    private Type type1;
-    @JoinColumn(name = "IDSESSION", referencedColumnName = "IDSESSION")
-    @ManyToOne
-    private Session session;
-    @JoinColumn(name = "IDIMAGE", referencedColumnName = "IDIMAGE")
-    @ManyToOne
-    private Imageresource imageresource;
+    private List<ScellFeature> scellFeatureList;
 
     public Scell() {
     }
@@ -85,69 +81,69 @@ public class Scell implements Serializable {
         this.idscell = idscell;
     }
 
-    public Integer getXPosition() {
-        return xPosition;
+    public Integer getX() {
+        return x;
     }
 
-    public void setXPosition(Integer xPosition) {
-        this.xPosition = xPosition;
+    public void setX(Integer x) {
+        this.x = x;
     }
 
-    public Integer getYPosition() {
-        return yPosition;
+    public Integer getY() {
+        return y;
     }
 
-    public void setYPosition(Integer yPosition) {
-        this.yPosition = yPosition;
+    public void setY(Integer y) {
+        this.y = y;
     }
 
-    public Integer getValid() {
-        return valid;
+    public Date getDate() {
+        return date;
     }
 
-    public void setValid(Integer valid) {
-        this.valid = valid;
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public SampleImage getIdimage() {
+        return idimage;
+    }
+
+    public void setIdimage(SampleImage idimage) {
+        this.idimage = idimage;
+    }
+
+    public Session getIdsession() {
+        return idsession;
+    }
+
+    public void setIdsession(Session idsession) {
+        this.idsession = idsession;
+    }
+
+    public Type getIdtype() {
+        return idtype;
+    }
+
+    public void setIdtype(Type idtype) {
+        this.idtype = idtype;
+    }
+
+    public Type getWinner() {
+        return winner;
+    }
+
+    public void setWinner(Type winner) {
+        this.winner = winner;
     }
 
     @XmlTransient
-    public List<Scellfeature> getScellfeatureList() {
-        return scellfeatureList;
+    public List<ScellFeature> getScellFeatureList() {
+        return scellFeatureList;
     }
 
-    public void setScellfeatureList(List<Scellfeature> scellfeatureList) {
-        this.scellfeatureList = scellfeatureList;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Type getType1() {
-        return type1;
-    }
-
-    public void setType1(Type type1) {
-        this.type1 = type1;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    public Imageresource getImageresource() {
-        return imageresource;
-    }
-
-    public void setImageresource(Imageresource imageresource) {
-        this.imageresource = imageresource;
+    public void setScellFeatureList(List<ScellFeature> scellFeatureList) {
+        this.scellFeatureList = scellFeatureList;
     }
 
     @Override
@@ -156,8 +152,6 @@ public class Scell implements Serializable {
         hash += (idscell != null ? idscell.hashCode() : 0);
         return hash;
     }
-    
-    
 
     @Override
     public boolean equals(Object object) {
@@ -174,15 +168,7 @@ public class Scell implements Serializable {
 
     @Override
     public String toString() {
-        return "persistence.Scell[ idscell=" + idscell + " ]";
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+        return "com.nbis.fluoj.persistence.Scell[ idscell=" + idscell + " ]";
     }
     
 }

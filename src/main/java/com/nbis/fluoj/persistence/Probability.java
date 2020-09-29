@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Column;
@@ -36,18 +36,18 @@ public class Probability implements Serializable {
     @EmbeddedId
     protected ProbabilityPK probabilityPK;
     @Column(name = "x")
-    private Short x;
+    private Integer x;
     @Column(name = "frequence")
     private Integer frequence;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "probability", precision = 8, scale = 8)
-    private Float probability;
-    @JoinColumn(name = "idcell_type", referencedColumnName = "idcell_type", nullable = false, insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private CellType cellType;
+    @Column(name = "probability", precision = 17, scale = 17)
+    private Double probability;
     @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Feature feature;
+    @JoinColumn(name = "idcell_type", referencedColumnName = "idtype", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Type type;
 
     public Probability() {
     }
@@ -68,11 +68,11 @@ public class Probability implements Serializable {
         this.probabilityPK = probabilityPK;
     }
 
-    public Short getX() {
+    public Integer getX() {
         return x;
     }
 
-    public void setX(Short x) {
+    public void setX(Integer x) {
         this.x = x;
     }
 
@@ -84,20 +84,12 @@ public class Probability implements Serializable {
         this.frequence = frequence;
     }
 
-    public Float getProbability() {
+    public Double getProbability() {
         return probability;
     }
 
-    public void setProbability(Float probability) {
+    public void setProbability(Double probability) {
         this.probability = probability;
-    }
-
-    public CellType getCellType() {
-        return cellType;
-    }
-
-    public void setCellType(CellType cellType) {
-        this.cellType = cellType;
     }
 
     public Feature getFeature() {
@@ -106,6 +98,14 @@ public class Probability implements Serializable {
 
     public void setFeature(Feature feature) {
         this.feature = feature;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override
@@ -130,7 +130,7 @@ public class Probability implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.Probability[ probabilityPK=" + probabilityPK + " ]";
+        return "com.nbis.fluoj.persistence.Probability[ probabilityPK=" + probabilityPK + " ]";
     }
     
 }

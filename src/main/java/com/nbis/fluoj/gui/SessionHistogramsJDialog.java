@@ -21,7 +21,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.classifier.Classifier;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.CellProcessor;
@@ -39,7 +39,7 @@ public class SessionHistogramsJDialog extends JDialog
 		super(parent);
 		this.em = parent.em;
 		if (classifier == null)
-			classifier = new Classifier(parent.getSample().getSession());
+			classifier = new Classifier(parent.getSample().getIdsession());
 		ChartPanel chartpn;
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("Sample Histograms");
@@ -54,15 +54,15 @@ public class SessionHistogramsJDialog extends JDialog
 		String title;
 		double x, y, min, max;
 		SimpleEntry<Double, Double> bin;
-		for (Samplefeature sf : classifier.getSample().getSamplefeatureList())
+		for (SampleFeature sf : classifier.getSample().getSampleFeatureList())
 		{
 
 			max = ConfigurationDB
-					.getMaxForFeatureOnSampleSession(sf.getSample().getSession().getIdsession(), sf.getFeature().getIdfeature(), parent.em);
+					.getMaxForFeatureOnSampleSession(sf.getSample().getIdsession().getIdsession(), sf.getFeature().getIdfeature(), parent.em);
 			min = ConfigurationDB
-					.getMinForFeatureOnSampleSession(sf.getSample().getSession().getIdsession(), sf.getFeature().getIdfeature(), parent.em);
+					.getMinForFeatureOnSampleSession(sf.getSample().getIdsession().getIdsession(), sf.getFeature().getIdfeature(), parent.em);
 			histogram = classifier.getHistogram(sf, em);
-			title = sf.getFeature().getFeature();
+			title = sf.getFeature().getName();
 			XYSeries series = new XYSeries(title);
 
 			for (int k = 0; k < histogram.length; k++)
@@ -80,7 +80,7 @@ public class SessionHistogramsJDialog extends JDialog
 			XYDataset histogramds = new XYSeriesCollection(series);
 
 			JFreeChart chart = ChartFactory
-					.createXYLineChart(title, sf.getFeature().getFeature(), "Probability", histogramds, PlotOrientation.VERTICAL, false, false, true);
+					.createXYLineChart(title, sf.getFeature().getName(), "Probability", histogramds, PlotOrientation.VERTICAL, false, false, true);
 			chart.getXYPlot().getDomainAxis().setRange(new Range(min, max));
 			chart.getXYPlot().getRangeAxis().setRange(new Range(0, 0.5));
 			chartpn = new ChartPanel(chart);

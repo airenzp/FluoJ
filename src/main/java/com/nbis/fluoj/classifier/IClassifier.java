@@ -10,9 +10,9 @@ import java.util.AbstractMap.SimpleEntry;
 import javax.persistence.EntityManager;
 
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Imageresource;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
 import com.nbis.fluoj.persistence.Cell;
 import com.nbis.fluoj.persistence.Type;
@@ -36,14 +36,14 @@ public interface IClassifier {
 	/**
 	 * @return {@link persistence.Session} associated with the classifier
 	 */
-	public int getSession();
+	public int getIdsession();
 	
 	/**
-	 * Persists {@link Scell} list and {@link persistence.Imageresource}
+	 * Persists {@link Scell} list and {@link persistence.Image}
 	 * @param scells {@link Scell} list to be persisted
 	 * @param img {@link ImagePlus} to be processed
 	 * @param em {@link EntityManager} to be used
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus}
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus}
 	 */
 	public int persistCellsOnImage(List<Scell> scells, ImagePlus img, EntityManager em);
 	
@@ -77,7 +77,7 @@ public interface IClassifier {
 	/**
 	 * Obtains {@link Scell} list from each {@link ImagePlus} provided using {@link classifier.FluoJImageProcessor}. 
 	 * Persists {@link Scell} list and 
-	 * {@link persistence.Imageresource} for each {@link ImagePlus}. 
+	 * {@link persistence.Image} for each {@link ImagePlus}. 
 	 * @param images {@link ImagePlus} list to be processed
 	 * @param em {@link EntityManager} to be used
 	 */
@@ -85,10 +85,10 @@ public interface IClassifier {
 	
 	/**
 	 * Obtains {@link Scell} list from {@link ImagePlus} provided using {@link classifier.FluoJImageProcessor}. 
-	 * Persists {@link Scell} list and {@link persistence.Imageresource} for {@link ImagePlus} image. 
+	 * Persists {@link Scell} list and {@link persistence.Image} for {@link ImagePlus} image. 
 	 * @param image {@link ImagePlus} to be processed
 	 * @param em {@link EntityManager} to be used
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus}
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus}
 	 */
 	public int persistCellsOnImage(ImagePlus image, boolean classified, EntityManager em);
 		
@@ -98,22 +98,22 @@ public interface IClassifier {
 	public void classify();
 
 	/**
-	 * Persists {@link Scell} list and {@link persistence.Imageresource} for {@link ImagePlus} image. 
+	 * Persists {@link Scell} list and {@link persistence.Image} for {@link ImagePlus} image. 
 	 * Classifies {@link Scell} list. 
 	 * Uses its own EntityManager.
 	 * @param scells {@link Scell} list
 	 * @param img {@link ImagePlus} to be processed
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus}
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus}
 	 */
 	public int classifyCellsOnImage(List<Scell> scells, ImagePlus img);
 	
 	/**
-	 * Persists {@link Scell} list and {@link persistence.Imageresource} for {@link ImagePlus} and 
+	 * Persists {@link Scell} list and {@link persistence.Image} for {@link ImagePlus} and 
 	 * classifies data.
 	 * @param scells {@link Scell} list
 	 * @param img {@link ImagePlus} to be processed
 	 * @param em {@link EntityManager} to be used
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus}
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus}
 	 */
 	 
 	public int classifyCellsOnImage(List<Scell> scells, ImagePlus img, EntityManager em);
@@ -138,7 +138,7 @@ public interface IClassifier {
 	 * Processes image using {@link classifier.FluoJImageProcessor} and classifies {@link Scell} list obtained. 
 	 * Uses its own {@link EntityManager}.
 	 * @param image {@link ImagePlus} to be processed
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus} image
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus} image
 	 */
 	public int classifyCellsOnImage(ImagePlus image);
 	
@@ -146,7 +146,7 @@ public interface IClassifier {
 	 * Processes image using {@link classifier.FluoJImageProcessor} and classifies {@link Scell} list obtained.
 	 * @param image {@link ImagePlus} to be processed
 	 * @param em {@link EntityManager} to be used
-	 * @return id generated for {@link persistence.Imageresource} associated to {@link ImagePlus} image
+	 * @return id generated for {@link persistence.Image} associated to {@link ImagePlus} image
 	 */
 	public int classifyCellsOnImage(ImagePlus image, EntityManager em);
 
@@ -155,7 +155,7 @@ public interface IClassifier {
 	 * @param em {@link EntityManager} to be used
 	 * @return total of {@link Scell} classified as {@link Type} 
 	 */
-	public  int getTotalFromWinner(Integer idtype, EntityManager em);
+	public  int getTotalFromWinner(Short idtype, EntityManager em);
 	
 	
 	
@@ -164,31 +164,8 @@ public interface IClassifier {
 	 * @param em {@link EntityManager} to be used
 	 * @return total of {@link Scell} classified by user as {@link Type} 
 	 */
-	public  int getTotalFromClass(Integer idtype, EntityManager em);
+	public  int getTotalFromClass(Short idtype, EntityManager em);
 	
-	/**
-	 * @param em {@link EntityManager} to be used
-	 * @return total of non fragmented {@link Scell}
-	 */
-	public  int getTotalNormal(EntityManager em);
-	
-	/**
-	 * @param em {@link EntityManager} to be used
-	 * @return total of Fragmented {@link Scell}
-	 */
-	public  int getTotalFragmented(EntityManager em);
-	
-	/**
-	 * @param em {@link EntityManager} to be used
-	 * @return total of DyedParticle {@link Scell}
-	 */
-	public  int getTotalDyedParticles(EntityManager em);
-	
-	/**
-	 * @param em {@link EntityManager} to be used
-	 * @return total of degraded {@link Scell}
-	 */
-	public  int getTotalDegraded(EntityManager em);
 	
 	/**
 	 * @param em {@link EntityManager} to be used
@@ -201,7 +178,7 @@ public interface IClassifier {
 	 * @param em {@link EntityManager} to be used
 	 * @return percent of {@link Scell} classified as {@link Type}
 	 */
-	public  float getPercentClassified(int idtype, EntityManager em);
+	public  float getPercentClassified(Short idtype, EntityManager em);
 
 	/**
 	 * @param em {@link EntityManager} to be used
@@ -219,7 +196,7 @@ public interface IClassifier {
 	 * @param winner {@link Type} id
 	 * @return total of particles classified by user as original and by software as winner. Allows nulls.
 	 */
-	public int getTotal(Integer original, Integer winner);
+	public int getTotal(Short original, Short winner);
 	
 	/**
 	 * @return total error percent
@@ -232,7 +209,7 @@ public interface IClassifier {
 	 * @param em {@link EntityManager} to be used
 	 * @return total error percent on {@link Scell} of winner idscelltpe
 	 */
-	public float getWinnerErrorPercent(int idtype, EntityManager em);
+	public float getWinnerErrorPercent(Short idtype, EntityManager em);
 
 	/**
 	 * @param em {@link EntityManager} to be used
@@ -241,20 +218,20 @@ public interface IClassifier {
 	public  List<Scell> getScells(EntityManager em);
 
 	/**
-	 * @param idimage {@link persistence.Imageresource} id
+	 * @param idimage {@link persistence.Image} id
 	 * @param em {@link EntityManager} to be used
 	 * @return {@link Scell} list registered
 	 */
 	public  List<Scell> getScells(int idimage, EntityManager em);
 	
 	/**
-	 * @param idimage {@link persistence.Imageresource} id
+	 * @param idimage {@link persistence.Image} id
 	 * @param original {@link Type} id
 	 * @param winner {@link Type} id
 	 * @param em {@link EntityManager} to be used
 	 * @return {@link Scell} list registered for idimage
 	 */
-	public  List<Scell> getScells(int idimage, Integer original, Integer winner, EntityManager em);
+	public  List<Scell> getScells(int idimage, Short original, Short winner, EntityManager em);
 	
 	
 	/**
@@ -290,7 +267,7 @@ public interface IClassifier {
 	 * @param em {@link EntityManager} to be used
 	 * @return Classifier Image filenames.
 	 */
-	public List<Imageresource> getImages(EntityManager em);
+	public List<SampleImage> getImages(EntityManager em);
 	
 	/**
 	 * @param em {@link EntityManager} to be used
@@ -301,7 +278,7 @@ public interface IClassifier {
 	/**
 	 * @param idscell {@link Scell} id
 	 * @param em {@link EntityManager} to be used
-	 * @return {@link CellTypeProbability} list for each {@link Type}
+	 * @return {@link Probability} list for each {@link Type}
 	 */
 	public List<CellTypeProbability> getProbs(Integer idscell, EntityManager em);
 	
@@ -310,5 +287,5 @@ public interface IClassifier {
 	
 	void removeOldSessionData();
 	
-	public SimpleEntry<Double, Double>[] getHistogram(Samplefeature sfeature, EntityManager em);
+	public SimpleEntry<Double, Double>[] getHistogram(SampleFeature sfeature, EntityManager em);
 }

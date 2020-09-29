@@ -263,7 +263,7 @@ public class EditSampleTypesJDialog extends JDialog implements ActionListener
 			else if (columnIndex == 3)
 			{
 				int trainingmin = (Integer) value;
-				type.setTrainingmin(trainingmin);
+				type.setTrainingMin(trainingmin);
 			}
 			types.set(types.indexOf(type), configurationdb.merge(type, em));
 		}
@@ -281,7 +281,7 @@ public class EditSampleTypesJDialog extends JDialog implements ActionListener
 			if (columnIndex == 2)
 				return new Color(t.getColor());
 			if (columnIndex == 3)
-				return t.getTrainingmin();
+				return t.getTrainingMin();
 			return null;
 		}
 

@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -32,8 +34,14 @@ public class ScellFeature implements Serializable {
     @EmbeddedId
     protected ScellFeaturePK scellFeaturePK;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "value", precision = 8, scale = 8)
-    private Float value;
+    @Column(name = "value", precision = 17, scale = 17)
+    private Double value;
+    @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Feature feature;
+    @JoinColumn(name = "idscell", referencedColumnName = "idscell", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private Scell scell;
 
     public ScellFeature() {
     }
@@ -54,12 +62,28 @@ public class ScellFeature implements Serializable {
         this.scellFeaturePK = scellFeaturePK;
     }
 
-    public Float getValue() {
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(Float value) {
+    public void setValue(Double value) {
         this.value = value;
+    }
+
+    public Feature getFeature() {
+        return feature;
+    }
+
+    public void setFeature(Feature feature) {
+        this.feature = feature;
+    }
+
+    public Scell getScell() {
+        return scell;
+    }
+
+    public void setScell(Scell scell) {
+        this.scell = scell;
     }
 
     @Override
@@ -84,7 +108,7 @@ public class ScellFeature implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.ScellFeature[ scellFeaturePK=" + scellFeaturePK + " ]";
+        return "com.nbis.fluoj.persistence.ScellFeature[ scellFeaturePK=" + scellFeaturePK + " ]";
     }
     
 }

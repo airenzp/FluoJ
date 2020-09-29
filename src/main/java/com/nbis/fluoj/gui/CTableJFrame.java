@@ -1,5 +1,6 @@
 package com.nbis.fluoj.gui;
 
+import com.nbis.fluoj.classifier.CellTypeProbability;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -34,17 +35,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
-import com.nbis.fluoj.persistence.Scellfeature;
+import com.nbis.fluoj.persistence.ScellFeature;
 import com.nbis.fluoj.classifier.ConfigurationDB;
-import com.nbis.fluoj.classifier.CellTypeProbability;
+import com.nbis.fluoj.persistence.Probability;
 import com.nbis.fluoj.classifier.Classifier;
 import com.nbis.fluoj.persistence.Type;
 
 /**
  * Displays {@link persistence.Scell} info including
- * {@link persistence.Scellfeature}, {@link persistence.Ftprobability}
+ * {@link persistence.ScellFeature}, {@link persistence.Probability}
  * 
  * @author Airen
  * 
@@ -68,7 +69,7 @@ public class CTableJFrame extends JFrame {
 
 	}
 
-	public CTableJFrame(Classifier classifier, int idimage, Integer original, Integer winner, EntityManager em) {
+	public CTableJFrame(Classifier classifier, int idimage, Short original, Short winner, EntityManager em) {
 		
 		this(classifier, classifier.getScells(idimage, original, winner, em), em);
 		
@@ -162,15 +163,15 @@ public class CTableJFrame extends JFrame {
 	class CellsTableModel extends AbstractTableModel {
 		private List<Scell> scells;
 		private List<String> column_names;
-		private List<Samplefeature> sfs;
+		private List<SampleFeature> sfs;
 		List<List<CellTypeProbability>> probs;
 		List<com.nbis.fluoj.persistence.Type> types;
 		private Object[][] rows;
 
 		public CellsTableModel(Classifier c, List<Scell> cells, EntityManager em) {
-			sfs = new ArrayList<Samplefeature>();
-			for(Samplefeature sf: c.getSample().getSamplefeatureList())
-				if(sf.getUseonclassification() == 1)
+			sfs = new ArrayList<SampleFeature>();
+			for(SampleFeature sf: c.getSample().getSampleFeatureList())
+				if(sf.getActive())
 					sfs.add(sf);
 			types = c.getSample().getTypeList();
 			this.scells = cells;
@@ -184,7 +185,7 @@ public class CTableJFrame extends JFrame {
 			column_names.add("X");
 			column_names.add("Y");
 			for (int i = 0; i < sfs.size(); i++)
-				column_names.add(sfs.get(i).getFeature().getFeature());
+				column_names.add(sfs.get(i).getFeature().getName());
 			column_names.add("Probability");
 
 			probs = new ArrayList<List<CellTypeProbability>>();
@@ -266,20 +267,20 @@ public class CTableJFrame extends JFrame {
 			int index;
 			Double prob;
 			NumberFormat formatter;
-			Integer idtype = 0;
+			Short idtype = 0;
 			List<CellTypeProbability> stprobs;
 			for (int y = 0, j = 0; y < rows.length - magnification + 1; y += magnification, j++) {
 				s = scells.get(j);
 				rows[y][0] = s.getIdscell();
-				rows[y][1] = s.getSession().getIdsession();
+				rows[y][1] = s.getIdsession().getIdsession();
 				rows[y][2] = s.getDate();
-				rows[y][3] = s.getImageresource().getName();
-				rows[y][4] = (s.getType() != null) ? s.getType().getName() : null;
-				rows[y][5] = (s.getType1() != null) ? s.getType1().getName() : null;
-				rows[y][6] = s.getXPosition();
-				rows[y][7] = s.getYPosition();
+				rows[y][3] = s.getIdimage().getName();
+				rows[y][4] = (s.getIdtype() != null) ? s.getIdtype().getName() : null;
+				rows[y][5] = (s.getWinner() != null) ? s.getWinner().getName() : null;
+				rows[y][6] = s.getX();
+				rows[y][7] = s.getY();
 				for (int x = 8, i = 0; x < 8 + sfs.size(); x++, i++)
-					rows[y][x] = getFeatureValue(s.getScellfeatureList(), sfs.get(i).getFeature().getIdfeature());
+					rows[y][x] = getFeatureValue(s.getScellFeatureList(), sfs.get(i).getFeature().getIdfeature());
 				for (int k = 0; k < types.size(); k++) {
 					rows[y + k + 1][4] = types.get(k).getName();
 					for (int x = 8, i = 0; x < 8 + sfs.size(); x++, i++) {
@@ -303,9 +304,9 @@ public class CTableJFrame extends JFrame {
 			}
 		}
 
-		private Object getFeatureValue(Collection<Scellfeature> values, Integer idfeature) {
-			Iterator<Scellfeature> iter = values.iterator();
-			Scellfeature ssf;
+		private Object getFeatureValue(Collection<ScellFeature> values, Short idfeature) {
+			Iterator<ScellFeature> iter = values.iterator();
+			ScellFeature ssf;
 			while (iter.hasNext()) {
 				ssf = iter.next();
 				if (ssf.getFeature().getIdfeature().equals(idfeature)) return String.format("%.2f", ssf.getValue());

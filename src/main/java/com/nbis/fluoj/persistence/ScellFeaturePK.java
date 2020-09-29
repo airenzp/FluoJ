@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -15,29 +15,29 @@ import javax.persistence.Embeddable;
  * @author airen
  */
 @Embeddable
-public class ProbabilityPK implements Serializable {
+public class ScellFeaturePK implements Serializable {
 
     @Basic(optional = false)
-    @Column(name = "idcell_type", nullable = false)
-    private short idcellType;
+    @Column(name = "idscell", nullable = false)
+    private int idscell;
     @Basic(optional = false)
     @Column(name = "idfeature", nullable = false)
     private short idfeature;
 
-    public ProbabilityPK() {
+    public ScellFeaturePK() {
     }
 
-    public ProbabilityPK(short idcellType, short idfeature) {
-        this.idcellType = idcellType;
+    public ScellFeaturePK(int idscell, short idfeature) {
+        this.idscell = idscell;
         this.idfeature = idfeature;
     }
 
-    public short getIdcellType() {
-        return idcellType;
+    public int getIdscell() {
+        return idscell;
     }
 
-    public void setIdcellType(short idcellType) {
-        this.idcellType = idcellType;
+    public void setIdscell(int idscell) {
+        this.idscell = idscell;
     }
 
     public short getIdfeature() {
@@ -51,7 +51,7 @@ public class ProbabilityPK implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) idcellType;
+        hash += (int) idscell;
         hash += (int) idfeature;
         return hash;
     }
@@ -59,11 +59,11 @@ public class ProbabilityPK implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ProbabilityPK)) {
+        if (!(object instanceof ScellFeaturePK)) {
             return false;
         }
-        ProbabilityPK other = (ProbabilityPK) object;
-        if (this.idcellType != other.idcellType) {
+        ScellFeaturePK other = (ScellFeaturePK) object;
+        if (this.idscell != other.idscell) {
             return false;
         }
         if (this.idfeature != other.idfeature) {
@@ -74,7 +74,7 @@ public class ProbabilityPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.ProbabilityPK[ idcellType=" + idcellType + ", idfeature=" + idfeature + " ]";
+        return "com.nbis.fluoj.persistence.ScellFeaturePK[ idscell=" + idscell + ", idfeature=" + idfeature + " ]";
     }
     
 }

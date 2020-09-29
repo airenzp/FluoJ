@@ -37,7 +37,7 @@ public class PreprocessingJDialog extends JDialog
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.insets = new Insets(10, 10, 10, 10);
 		setLayout(new GridBagLayout());
-		filterspn = new PreprocessingPane(frame, frame.getSample(), frame.getSample().getSamplefilterList());
+		filterspn = new PreprocessingPane(frame, frame.getSample(), frame.getSample().getFilterList());
 		add(filterspn, FluoJUtils.getConstraints(constraints, 0, 0, 1));
 		okbt = new JButton("Ok");
 		filterspn.addButton(okbt);
@@ -60,7 +60,7 @@ public class PreprocessingJDialog extends JDialog
 				{
 					int result = frame.resetDB();
 					if(result == JOptionPane.YES_OPTION)
-						ConfigurationDB.persist(frame.getSample().getSamplefilterList(), em);
+						ConfigurationDB.persist(frame.getSample().getFilterList(), em);
 				}
 				setVisible(false);
 				dispose();

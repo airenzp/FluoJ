@@ -1,5 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
@@ -10,8 +11,6 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -29,35 +28,32 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author airen
  */
 @Entity
-@Table(name = "SESSION")
+@Table(name = "session")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Session.findAll", query = "SELECT s FROM Session s"),
     @NamedQuery(name = "Session.findByIdsession", query = "SELECT s FROM Session s WHERE s.idsession = :idsession"),
-    @NamedQuery(name = "Session.findByDate", query = "SELECT s FROM Session s WHERE s.date = :date"),
-    @NamedQuery(name = "Session.findByWell", query = "SELECT s FROM Session s WHERE s.well = :well"),
-    @NamedQuery(name = "Session.findByName", query = "SELECT s FROM Session s WHERE s.name = :name")})
+    @NamedQuery(name = "Session.findByName", query = "SELECT s FROM Session s WHERE s.name = :name"),
+    @NamedQuery(name = "Session.findByDate", query = "SELECT s FROM Session s WHERE s.date = :date")})
 public class Session implements Serializable {
-    @Column(name =     "DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "IDSESSION")
+    @Column(name = "idsession", nullable = false)
     private Integer idsession;
-    @Column(name = "WELL")
-    private String well;
-    @Column(name = "NAME")
+    @Column(name = "name", length = 50)
     private String name;
-    @OneToMany(mappedBy = "session")
-    private List<Sample> sampleList;
-    @OneToMany(mappedBy = "session")
-    private List<Scell> scellList;
-    @JoinColumn(name = "IDSAMPLE", referencedColumnName = "IDSAMPLE")
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private Date date;
+    @JoinColumn(name = "idsample", referencedColumnName = "idsample")
     @ManyToOne
-    private Sample sample;
+    private Sample idsample;
+    @OneToMany(mappedBy = "idsession")
+    private List<Sample> sampleList;
+    @OneToMany(mappedBy = "idsession")
+    private List<Scell> scellList;
 
     public Session() {
     }
@@ -74,20 +70,28 @@ public class Session implements Serializable {
         this.idsession = idsession;
     }
 
-    public String getWell() {
-        return well;
-    }
-
-    public void setWell(String well) {
-        this.well = well;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Sample getIdsample() {
+        return idsample;
+    }
+
+    public void setIdsample(Sample idsample) {
+        this.idsample = idsample;
     }
 
     @XmlTransient
@@ -106,14 +110,6 @@ public class Session implements Serializable {
 
     public void setScellList(List<Scell> scellList) {
         this.scellList = scellList;
-    }
-
-    public Sample getSample() {
-        return sample;
-    }
-
-    public void setSample(Sample sample) {
-        this.sample = sample;
     }
 
     @Override
@@ -138,17 +134,7 @@ public class Session implements Serializable {
 
     @Override
     public String toString() {
-	if(idsession == null)
-	    return name;
-        return idsession.toString();
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+        return "com.nbis.fluoj.persistence.Session[ idsession=" + idsession + " ]";
     }
     
 }

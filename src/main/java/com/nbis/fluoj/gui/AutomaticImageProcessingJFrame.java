@@ -123,7 +123,7 @@ public class AutomaticImageProcessingJFrame extends FluoJJFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//Classifier c = classifiers.get(table.getSelectedRow());
-				//new ComparisonJFrame(c.sample, c.getSession());
+				//new ComparisonJFrame(c.sample, c.getIdsession());
 				SwingUtilities.invokeLater(new Runnable() {
 					
 					@Override

@@ -1,5 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
@@ -11,8 +12,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -30,39 +29,36 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author airen
  */
 @Entity
-@Table(name = "CELL")
+@Table(name = "cell")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Cell.findAll", query = "SELECT c FROM Cell c"),
     @NamedQuery(name = "Cell.findByIdcell", query = "SELECT c FROM Cell c WHERE c.idcell = :idcell"),
-    @NamedQuery(name = "Cell.findByXPosition", query = "SELECT c FROM Cell c WHERE c.xPosition = :xPosition"),
-    @NamedQuery(name = "Cell.findByYPosition", query = "SELECT c FROM Cell c WHERE c.yPosition = :yPosition"),
+    @NamedQuery(name = "Cell.findByX", query = "SELECT c FROM Cell c WHERE c.x = :x"),
+    @NamedQuery(name = "Cell.findByY", query = "SELECT c FROM Cell c WHERE c.y = :y"),
     @NamedQuery(name = "Cell.findByDate", query = "SELECT c FROM Cell c WHERE c.date = :date")})
 public class Cell implements Serializable {
-    @Column(name =     "DATE")
-    @Temporal(TemporalType.DATE)
-    private Date date;
+
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "IDCELL")
+    @Column(name = "idcell", nullable = false)
     private Integer idcell;
-    @Column(name = "X_POSITION")
-    private Integer xPosition;
-    @Column(name = "Y_POSITION")
-    private Integer yPosition;
+    @Column(name = "x")
+    private Integer x;
+    @Column(name = "y")
+    private Integer y;
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private Date date;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cell")
-    private List<Cellfeature> cellfeatureList;
-    @JoinColumn(name = "CLASS", referencedColumnName = "IDTYPE")
+    private List<CellFeature> cellFeatureList;
+    @JoinColumn(name = "idimage", referencedColumnName = "idimage")
     @ManyToOne
-    private Type type;
-    @JoinColumn(name = "IDSAMPLE", referencedColumnName = "IDSAMPLE")
-    @ManyToOne(optional = false)
-    private Sample sample;
-    @JoinColumn(name = "IDIMAGE", referencedColumnName = "IDIMAGE")
+    private SampleImage idimage;
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype")
     @ManyToOne
-    private Imageresource imageresource;
+    private Type idtype;
 
     public Cell() {
     }
@@ -79,53 +75,53 @@ public class Cell implements Serializable {
         this.idcell = idcell;
     }
 
-    public Integer getXPosition() {
-        return xPosition;
+    public Integer getX() {
+        return x;
     }
 
-    public void setXPosition(Integer xPosition) {
-        this.xPosition = xPosition;
+    public void setX(Integer x) {
+        this.x = x;
     }
 
-    public Integer getYPosition() {
-        return yPosition;
+    public Integer getY() {
+        return y;
     }
 
-    public void setYPosition(Integer yPosition) {
-        this.yPosition = yPosition;
+    public void setY(Integer y) {
+        this.y = y;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @XmlTransient
-    public List<Cellfeature> getCellfeatureList() {
-        return cellfeatureList;
+    public List<CellFeature> getCellFeatureList() {
+        return cellFeatureList;
     }
 
-    public void setCellfeatureList(List<Cellfeature> cellfeatureList) {
-        this.cellfeatureList = cellfeatureList;
+    public void setCellFeatureList(List<CellFeature> cellFeatureList) {
+        this.cellFeatureList = cellFeatureList;
     }
 
-    public Type getType() {
-        return type;
+    public SampleImage getIdimage() {
+        return idimage;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setIdimage(SampleImage idimage) {
+        this.idimage = idimage;
     }
 
-    public Sample getSample() {
-        return sample;
+    public Type getIdtype() {
+        return idtype;
     }
 
-    public void setSample(Sample sample) {
-        this.sample = sample;
-    }
-
-    public Imageresource getImageresource() {
-        return imageresource;
-    }
-
-    public void setImageresource(Imageresource imageresource) {
-        this.imageresource = imageresource;
+    public void setIdtype(Type idtype) {
+        this.idtype = idtype;
     }
 
     @Override
@@ -150,15 +146,7 @@ public class Cell implements Serializable {
 
     @Override
     public String toString() {
-        return "persistence.Cell[ idcell=" + idcell + " ]";
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+        return "com.nbis.fluoj.persistence.Cell[ idcell=" + idcell + " ]";
     }
     
 }

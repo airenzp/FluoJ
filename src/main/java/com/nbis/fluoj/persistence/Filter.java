@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.nbis.fluoj.entities;
+package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -105,7 +105,7 @@ public class Filter implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.entities.Filter[ idfilter=" + idfilter + " ]";
+        return "com.nbis.fluoj.persistence.Filter[ idfilter=" + idfilter + " ]";
     }
     
 }

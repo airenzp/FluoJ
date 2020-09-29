@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.persistence.EntityManager;
 import com.nbis.fluoj.persistence.Cell;
-import com.nbis.fluoj.persistence.Cellfeature;
+import com.nbis.fluoj.persistence.CellFeature;
 import com.nbis.fluoj.persistence.Feature;
-import com.nbis.fluoj.persistence.Ftprobability;
+import com.nbis.fluoj.persistence.Probability;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Type;
 
 /**
@@ -41,11 +41,11 @@ public class CellProcessor {
 			Sample sample = cdb.getSample(78, em);
 			if (sample == null)
 				throw new IllegalArgumentException("no sample provided");
-			List<Samplefeature> features = sample.getSamplefeatureList();
+			List<SampleFeature> features = sample.getSampleFeatureList();
 			if (features.isEmpty())
 				throw new IllegalArgumentException("no features provided");
 
-			for (Samplefeature sf : sample.getSamplefeatureList()) {
+			for (SampleFeature sf : sample.getSampleFeatureList()) {
 				CellProcessor sc = new CellProcessor(sample);
 				sc.exportHistograms(sf, ConfigurationDB.fluojdir, em);
 			}
@@ -62,7 +62,7 @@ public class CellProcessor {
 
 	/**
 	 * Process {@link Cell} info persisted to generate histograms stored on
-	 * {@link Ftprobability}. Statistics obtained are requested by
+	 * {@link Probability}. Statistics obtained are requested by
 	 * {@link ClassifierDB} to provide classification data used on
 	 * {@link CClassifier}.
 	 * 
@@ -73,13 +73,13 @@ public class CellProcessor {
 		Feature feature;
 		Type type;
 		pdb.deleteProbabilities(em);
-		List<Samplefeature> sfeatures = sample.getSamplefeatureList();
+		List<SampleFeature> sfeatures = sample.getSampleFeatureList();
 		List<Type> types = sample.getTypeList();
-		List<Ftprobability> ftps;
+		List<Probability> ftps;
 		for (int i = 0; i < types.size(); i++) {
 			type = types.get(i);
 			for (int j = 0; j < sfeatures.size(); j++) {
-				if (sfeatures.get(j).getUseonclassification() == 0)
+				if (!sfeatures.get(j).getActive())
 					continue;
 				feature = sfeatures.get(j).getFeature();
 				ftps = pdb.initializeHistogram(type, feature, em);
@@ -117,17 +117,17 @@ public class CellProcessor {
 		Type type;
 		Feature f;
 		for (int i = 0; i < types.size(); i++)
-			for (Samplefeature sf : sample.getSamplefeatureList()) {
+			for (SampleFeature sf : sample.getSampleFeatureList()) {
 				type = types.get(i);
 				f = sf.getFeature();
-				System.out.println(String.format(" %s %s. Min:%s Max:%s", type.getName(), f.getFeature(), sf.getMin(), sf.getMax()));
-				if (type.getFtprobabilityList().size() == 0) {
+				System.out.println(String.format(" %s %s. Min:%s Max:%s", type.getName(), f.getName(), sf.getMin(), sf.getMax()));
+				if (type.getProbabilityList().size() == 0) {
 					// System.out.println(String.format("Type %s with no histogram",
 					// type.getName()));
 					continue;
 				}
-				List<Ftprobability> probs;
-				Ftprobability ftp;
+				List<Probability> probs;
+				Probability ftp;
 				probs = pdb.getProbabilities(type.getIdtype(), f.getIdfeature(), em);
 
 				for (int k = 0; k < probs.size(); k++) {
@@ -140,31 +140,31 @@ public class CellProcessor {
 	}
 
 	/**
-	 * Imports data from current session to {@link Cell} and {@link Cellfeature}
+	 * Imports data from current session to {@link Cell} and {@link CellFeature}
 	 * tables usually used before {@link CellProcessor#processCells()}.
 	 * 
 	 * @param em
 	 *            {@link EntityManager} to be used
 	 */
 	public void importTrainingData(EntityManager em) {
-		pdb.importTrainingData(sample.getSession(), em);
+		pdb.importTrainingData(sample.getIdsession(), em);
 	}
 
 	/**
-	 * Obtains probabilities from frequences and updates {@link Ftprobability}
+	 * Obtains probabilities from frequences and updates {@link Probability}
 	 * 
 	 * @param ftps
 	 */
-	public void normalizeHistogram(List<Ftprobability> ftps, Type type) {
+	public void normalizeHistogram(List<Probability> ftps, Type type) {
 		double sum = 0;
-		Ftprobability ftp;
+		Probability ftp;
 		for (int i = 0; i < ftps.size(); i++) {
 			ftp = ftps.get(i);
 			sum += ftp.getFrequence();
 		}
-		if (sum < type.getTrainingmin()) {
+		if (sum < type.getTrainingMin()) {
 
-			String msg = String.format("Min sample number is %s, provided %s", type.getTrainingmin(), sum);
+			String msg = String.format("Min sample number is %s, provided %s", type.getTrainingMin(), sum);
 			IllegalArgumentException e = new IllegalArgumentException(msg);
 			//Classifier.getLogger().log(Level.SEVERE, e.getMessage(), e);
 			throw e;
@@ -182,12 +182,12 @@ public class CellProcessor {
 
 	}
 
-	public double[][] getHistograms(Samplefeature sf, String dir, EntityManager em) {
+	public double[][] getHistograms(SampleFeature sf, String dir, EntityManager em) {
 		double[][] histograms = null;
 		try {
-			if (sf.getUseonclassification() == 0)
+			if (!sf.getActive())
 				return null;
-			String file = String.format("%s/%s-%s.txt", dir, sf.getSample().getName(), sf.getFeature().getFeature());
+			String file = String.format("%s/%s-%s.txt", dir, sf.getSample().getName(), sf.getFeature().getName());
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			List<Object[]> hist;
 			String line = "";
@@ -220,11 +220,11 @@ public class CellProcessor {
 		return histograms;
 	}
 
-	public void exportHistograms(Samplefeature sf, String dir, EntityManager em) throws InvalidOperationOnResourceException {
+	public void exportHistograms(SampleFeature sf, String dir, EntityManager em) throws InvalidOperationOnResourceException {
 		try {
-			if (sf.getUseonclassification() == 0)
+			if (!sf.getActive())
 				return;
-			String file = String.format("%s/%s-%s.txt", dir, sf.getSample().getName(), sf.getFeature().getFeature());
+			String file = String.format("%s/%s-%s.txt", dir, sf.getSample().getName(), sf.getFeature().getName());
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 			List<Object[]> hist;
 			String line = "";

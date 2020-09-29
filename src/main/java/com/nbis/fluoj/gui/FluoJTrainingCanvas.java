@@ -78,12 +78,12 @@ public class FluoJTrainingCanvas extends FluoJImageCanvas {
 		CellInfo ci;
 		for (SegmentedParticle il : ils) {
 			ci = il.getCellInfo();
-			if (ci.getType() == null)
+			if (ci.getIdtype() == null)
 				continue;
-			label = ci.getType().getLabel();
+			label = ci.getIdtype().getLabel();
 			x = (int) ((il.getCellInfo().getX0() - x0) * magnification);
 			y = (int) ((il.getCellInfo().getY0() - y0) * magnification);
-			g2.setColor(new Color(ci.getType().getColor()));
+			g2.setColor(new Color(ci.getIdtype().getColor()));
 			g2.drawString(label, x, y);
 		}
 	}

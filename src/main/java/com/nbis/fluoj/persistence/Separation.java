@@ -1,12 +1,20 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -15,41 +23,36 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author airen
  */
 @Entity
-@Table(name = "SEPARATION")
+@Table(name = "separation")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Separation.findAll", query = "SELECT s FROM Separation s"),
     @NamedQuery(name = "Separation.findByIdseparation", query = "SELECT s FROM Separation s WHERE s.idseparation = :idseparation"),
     @NamedQuery(name = "Separation.findByName", query = "SELECT s FROM Separation s WHERE s.name = :name")})
 public class Separation implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @Column(name = "IDSEPARATION")
-    private Integer idseparation;
-    @Basic(optional = false)
-    @Column(name = "NAME")
+    @Column(name = "idseparation", nullable = false)
+    private Short idseparation;
+    @Column(name = "name", length = 50)
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "separation")
+    @OneToMany(mappedBy = "idseparation")
     private List<Sample> sampleList;
 
     public Separation() {
     }
 
-    public Separation(Integer idseparation) {
+    public Separation(Short idseparation) {
         this.idseparation = idseparation;
     }
 
-    public Separation(Integer idseparation, String name) {
-        this.idseparation = idseparation;
-        this.name = name;
-    }
-
-    public Integer getIdseparation() {
+    public Short getIdseparation() {
         return idseparation;
     }
 
-    public void setIdseparation(Integer idseparation) {
+    public void setIdseparation(Short idseparation) {
         this.idseparation = idseparation;
     }
 
@@ -92,7 +95,7 @@ public class Separation implements Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return "com.nbis.fluoj.persistence.Separation[ idseparation=" + idseparation + " ]";
     }
     
 }

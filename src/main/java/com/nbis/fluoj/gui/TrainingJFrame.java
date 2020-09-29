@@ -286,7 +286,7 @@ public class TrainingJFrame extends FluoJJFrame {
 		else 
 			typespn.initTypesPane(newclassifier, em);
 		typespn.updateTotals();
-		thresholdlb.setText(String.valueOf(sample.getThreshold()));
+		thresholdlb.setText(String.valueOf(sample.getImageThreshold()));
 	}
 
 	

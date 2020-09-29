@@ -6,16 +6,13 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import com.nbis.fluoj.persistence.Samplefilter;
-import com.nbis.fluoj.persistence.SamplefilterPK;
+import com.nbis.fluoj.persistence.Filter;
 
 public class AddSampleFilterJDialog extends JDialog {
 	
@@ -25,7 +22,7 @@ public class AddSampleFilterJDialog extends JDialog {
 	private ConfigurationJFrame parent;
 	private JTextField optionstf;
 	protected JColorChooser colorChooser;
-	private List<Samplefilter> filters;
+	private List<Filter> filters;
 	private PreprocessingPane filtersPane;
 	private ConfigurationJFrame frame;
 	
@@ -78,17 +75,14 @@ public class AddSampleFilterJDialog extends JDialog {
 					return;
 				}
 				String options = optionstf.getText();
-				Samplefilter sf = new Samplefilter();
+				Filter sf = new Filter();
 				sf.setCommand(command);
-				sf.setCommandoptions(options);
-				SamplefilterPK pk = new SamplefilterPK();
-				pk.setIdfilter(filters.size() + 1);
+				sf.setOptions(options);
 				if(frame.getSample() != null)
-					pk.setIdsample(frame.getSample().getIdsample());
-				sf.setSamplefilterPK(pk);
+                                    sf.setIdsample(frame.getSample());
 				try
 				{
-					filtersPane.addSamplefilter(sf);
+					filtersPane.addFilter(sf);
 				}
 				catch(IllegalArgumentException ex)
 				{

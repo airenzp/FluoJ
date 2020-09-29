@@ -12,12 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplecorefeature;
-import com.nbis.fluoj.persistence.Samplefeature;
-import com.nbis.fluoj.persistence.Samplefilter;
+import com.nbis.fluoj.persistence.SampleFeature;
+import com.nbis.fluoj.persistence.SampleFeature;
+import com.nbis.fluoj.persistence.Filter;
 import com.nbis.fluoj.persistence.Scell;
-import com.nbis.fluoj.persistence.Scellfeature;
-import com.nbis.fluoj.persistence.ScellfeaturePK;
+import com.nbis.fluoj.persistence.ScellFeature;
+import com.nbis.fluoj.persistence.ScellFeaturePK;
 import counter.BinaryLabel8;
 
 /**
@@ -98,7 +98,7 @@ public class FluoJImageProcessor
 			throw new InvalidOperationOnResourceException("Invalid path for image " + imp.getTitle());
 		this.sample = sample;
 		this.typed = typed;
-		int threshold = sample.getThreshold();
+		int threshold = sample.getImageThreshold();
 		try
 		{
 			count = 0;
@@ -108,7 +108,7 @@ public class FluoJImageProcessor
 			height = imp.getHeight();
 			if (debug)
 				displayProcessImage(imp, "original");
-			grayimp = getProcessImage(sample.getSamplefilterList(), imp);
+			grayimp = getProcessImage(sample.getFilterList(), imp);
 			grayip = grayimp.getProcessor().convertToByte(false);
 
 			if (debug)
@@ -125,11 +125,11 @@ public class FluoJImageProcessor
 				displayProcessImage(segmentationimp.duplicate(), "particles threshold");
 			
 			segmentationip.invertLut();
-			if (sample.getFillholes() == 1)
+			if (sample.getFillHoles())
 				run(segmentationimp, "Fill Holes", "");// fill holes applied
-			if (sample.getSeparation().getIdseparation() == 1)// watershed
+			if (sample.getIdseparation().getIdseparation() == 1)// watershed
 				run(segmentationimp, "Watershed", "");
-			else if (sample.getSeparation().getIdseparation() == 2)
+			else if (sample.getIdseparation().getIdseparation() == 2)
 			{
 
 				ImageProcessor bordersip = grayip.duplicate();
@@ -144,7 +144,7 @@ public class FluoJImageProcessor
 						if (segmentationip.getPixel(x, y) == 255 && bordersip.getPixel(x, y) > 220)
 							segmentationip.putPixel(x, y, 0);
 				if (debug)
-					displayProcessImage(segmentationimp.duplicate(), "Separation utility " + sample.getSeparation().getName());
+					displayProcessImage(segmentationimp.duplicate(), "Separation utility " + sample.getIdseparation().getName());
 				// to remove noise introduced by convolve on particles
 
 				run(segmentationimp, "Erode", "");
@@ -162,10 +162,10 @@ public class FluoJImageProcessor
 			if (debug)
 				displayProcessImage(new ImagePlus("", segmentationip), "particles labelled");
 			ImageProcessor roisip = null;
-			if (sample.getRoismax() > 0)
+			if (sample.getRoisThreshold() > 0)
 			{
 				roisip = grayimp.getProcessor().duplicate();
-				roisip.threshold(sample.getRoisthreshold());// threshold
+				roisip.threshold(sample.getRoisThreshold());// threshold
 																// applied
 				roisip = roisip.convertToShort(false);
 				labeller.setup("", new ImagePlus("", roisip));
@@ -197,7 +197,7 @@ public class FluoJImageProcessor
 						originalparticles.add(il);
 					}
 					il.addPoint(new ParticlePoint(x, y, grayip.getPixel(x, y), label));
-					if (sample.getRoismax() > 0)
+					if (sample.getRoisThreshold() > 0)
 					{
 
 						label = roisip.getPixel(x, y);
@@ -218,7 +218,7 @@ public class FluoJImageProcessor
 
 				}
 			System.out.println("Filtering Particles");
-			filterParticles(sample.getSamplefeatureList(), sample.getSamplecorefeatureList());
+			filterParticles(sample.getSampleFeatureList(), sample.getSampleFeatureList());
 
 			System.out.println("Segmentation ended");
 		}
@@ -253,7 +253,7 @@ public class FluoJImageProcessor
 	
 	public int getBordersThreshold(Sample sample)
 	{
-		return (int) (2.5 * sample.getThreshold());
+		return (int) (2.5 * sample.getImageThreshold());
 	}
 
 	public static boolean validPoint(int x, int y, int width, int height)
@@ -266,25 +266,25 @@ public class FluoJImageProcessor
 		return (y <= 0 || y >= height - 1 || x <= 0 || x >= width - 1);
 	}
 
-	public static ImagePlus getProcessImage(List<Samplefilter> filters, ImagePlus img)
+	public static ImagePlus getProcessImage(List<Filter> filters, ImagePlus img)
 	{
 		ImagePlus grayimp = img.duplicate();
 		grayimp.setTitle("grayimp");
-		for (Samplefilter f : filters)
-			IJ.run(grayimp, f.getCommand(), f.getCommandoptions());
+		for (Filter f : filters)
+			IJ.run(grayimp, f.getCommand(), f.getOptions());
 
 		return grayimp;
 	}
 
-	public void filterParticles(List<Samplefeature> sfs, List<Samplecorefeature> scfs)
+	public void filterParticles(List<SampleFeature> sfs, List<SampleFeature> scfs)
 	{
 		System.out.println("Starting to filter particles");
 		filteredparticles = new ArrayList<SegmentedParticle>();
 		for (SegmentedParticle il : originalparticles)
 		{
-			if (sample.getExpansionradius() > 0)
-				addBorders(il, sample.getExpansionradius());
-			if (sample.getRoismax() > 0)
+			if (sample.getExpansionRadius() > 0)
+				addBorders(il, sample.getExpansionRadius());
+			if (sample.getRoisThreshold() > 0)
 				il.filterROIS(scfs);
 			if (!il.onBorder() && il.isValid(sfs))
 				filteredparticles.add(il);
@@ -307,7 +307,7 @@ public class FluoJImageProcessor
 		for (ParticlePoint point : points)
 			if (ParticleStatistic.isPerimeter(point, il, width, height))
 				ppoints.add(point);
-		int threshold = sample.getThreshold();// Bright borders have more
+		int threshold = sample.getImageThreshold();// Bright borders have more
 												// threshold
 		for (ParticlePoint point : ppoints)
 		{
@@ -348,7 +348,7 @@ public class FluoJImageProcessor
 		Scell ss;
 		for (SegmentedParticle il : filteredparticles)
 		{
-			if (typed && il.getCellInfo().getType() == null)
+			if (typed && il.getCellInfo().getIdtype() == null)
 				continue;
 			ss = getScell(il.getCellInfo());
 			scells.add(ss);
@@ -360,22 +360,22 @@ public class FluoJImageProcessor
 	{
 		Scell ss = new Scell();
 		if (typed)
-			ss.setType(info.getType());
-		ss.setXPosition(info.getX0());
-		ss.setYPosition(info.getY0());
+			ss.setIdtype(info.getIdtype());
+		ss.setX(info.getX0());
+		ss.setY(info.getY0());
 		double value = 0;
-		Scellfeature ssf;
+		ScellFeature ssf;
 		int idfeature;
-		ss.setScellfeatureList(new ArrayList<Scellfeature>());
-		for (Samplefeature sf : sample.getSamplefeatureList())
+		ss.setScellFeatureList(new ArrayList<ScellFeature>());
+		for (SampleFeature sf : sample.getSampleFeatureList())
 		{
 			idfeature = sf.getFeature().getIdfeature();
 			value = info.getValue(idfeature);
-			ssf = new Scellfeature(new ScellfeaturePK());
+			ssf = new ScellFeature(new ScellFeaturePK());
 			ssf.setFeature(sf.getFeature());
 			ssf.setScell(ss);
 			ssf.setValue(value);
-			ss.getScellfeatureList().add(ssf);
+			ss.getScellFeatureList().add(ssf);
 		}
 		return ss;
 	}
@@ -460,7 +460,7 @@ public class FluoJImageProcessor
 
 				for (Point point : il.getCellInfo().getPpoints())
 					ipc.putPixel(point.x, point.y, color);
-				if (sample.getRoismax() > 0)
+				if (sample.getRoisThreshold() > 0)
 					for (Point point : il.getCellInfo().getIPPoints())
 						ipc.putPixel(point.x, point.y, corecolor);
 			}
@@ -488,7 +488,7 @@ public class FluoJImageProcessor
 
 	public void filterParticles()
 	{
-		filterParticles(sample.getSamplefeatureList(), sample.getSamplecorefeatureList());
+		filterParticles(sample.getSampleFeatureList(), sample.getSampleFeatureList());
 
 	}
 

@@ -110,9 +110,9 @@ public class TypesPane extends JPanel
 		JLabel totallb;
 		int count;
 		int total;
-		com.nbis.fluoj.persistence.Type type;
+		Type type;
 
-		public TypeRow(com.nbis.fluoj.persistence.Type type, int count, int total)
+		public TypeRow(Type type, int count, int total)
 		{
 
 			
@@ -141,7 +141,7 @@ public class TypesPane extends JPanel
 
 	}
 	
-	TypeRow getTypeRow(String label) {
+	TypeRow getIdtypeRow(String label) {
 		for (TypeRow tr : typerows)
 			if (tr.type.getLabel().equals(label))
 				return tr;
@@ -149,7 +149,7 @@ public class TypesPane extends JPanel
 	}
 
 	public void setActiveType(String label) {
-		TypeRow tr = getTypeRow(label);
+		TypeRow tr = getIdtypeRow(label);
 		if (tr != null) {
 			System.out.println("Setting sample type: " + tr.type.getName());
 			typesbg.setSelected(tr.rb.getModel(), true);
@@ -179,7 +179,7 @@ public class TypesPane extends JPanel
 		int[] count = new int[types.size()];
 		for (SegmentedParticle il : particles)
 			for (int i = 0; i < types.size(); i++)
-				if (il.getCellInfo().getType() != null && il.getCellInfo().getType().getIdtype() == types.get(i).getIdtype())
+				if (il.getCellInfo().getIdtype() != null && il.getCellInfo().getIdtype().getIdtype() == types.get(i).getIdtype())
 					count[i]++;
 		for (int i = 0; i < types.size(); i++)
 			typerows.get(i).setCount(count[i]);
@@ -194,9 +194,9 @@ public class TypesPane extends JPanel
 			count = 0;
 			for (int i = 0; i < scells.size(); i++)
 			{
-				if (scells.get(i).getType() != null && scells.get(i).getType().getIdtype() == id)
+				if (scells.get(i).getIdtype() != null && scells.get(i).getIdtype().getIdtype() == id)
 					count++;
-				if (scells.get(i).getType() == null && -1 == id)
+				if (scells.get(i).getIdtype() == null && -1 == id)
 					count++;
 			}
 			typerows.get(k).setCount(count);

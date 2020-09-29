@@ -24,11 +24,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
-import com.nbis.fluoj.persistence.Imageresource;
+import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
 import com.nbis.fluoj.persistence.Scell;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.Classifier;
+import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 
 /*
@@ -53,7 +54,7 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 	private JButton closeimgs_bt;
 	private JComboBox imagecb;
 	private List<Scell> scells;
-	private Imageresource ir;
+	private SampleImage ir;
 	private CTableJFrame tablefr;
 	private JButton cells_infobt;
 
@@ -62,7 +63,7 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 	private JComboBox winnercb;
 	private JPanel filterpn;
 	private JPanel buttons_pn;
-	private List<Imageresource> images;
+	private List<SampleImage> images;
 
 	public static void main(String[] args)
 	{
@@ -105,7 +106,7 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 	 * Empty constructor. Uses current session classifier and no image
 	 * specified.
 	 */
-	public ReviewJFrame(Classifier classifier, Imageresource ir) throws InvalidOperationOnResourceException
+	public ReviewJFrame(Classifier classifier, SampleImage ir) throws InvalidOperationOnResourceException
 	{
 		initSamples();
 		initComponents(classifier);
@@ -134,7 +135,7 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 		initSamples();
 		initComponents(classifier);
 		if (idimage != -1)
-			for (Imageresource ir : images)
+			for (SampleImage ir : images)
 				if (ir.getIdimage().equals(idimage))
 				{
 					imagecb.setSelectedItem(ir);
@@ -349,8 +350,8 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 	protected void loadImage() throws InvalidOperationOnResourceException
 	{
 		closeWindows();
-		ir = (Imageresource) imagecb.getSelectedItem();
-		ImagePlus img = ir.getImagePlus();
+		ir = (SampleImage) imagecb.getSelectedItem();
+		ImagePlus img = new ImagePlus(ConfigurationDB.getPath(ir));
 
 		cip = new FluoJImageProcessor(img, sample, false);
 
@@ -391,7 +392,7 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 
 	}
 
-	private void fillClassifierComponents(List<Imageresource> images)
+	private void fillClassifierComponents(List<SampleImage> images)
 	{
 
 		imagecb.setModel(new DefaultComboBoxModel(images.toArray()));
@@ -401,11 +402,13 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 		else
 			typespn.initTypesPane(classifier, em);
 		typespn.updateTotals();
-		thresholdlb.setText(String.valueOf(sample.getThreshold()));
+		thresholdlb.setText(String.valueOf(sample.getImageThreshold()));
 		List<com.nbis.fluoj.persistence.Type> types = new ArrayList<com.nbis.fluoj.persistence.Type>(classifier.getSample().getTypeList());
-		com.nbis.fluoj.persistence.Type unknown = new com.nbis.fluoj.persistence.Type(null, "None");
+		com.nbis.fluoj.persistence.Type unknown = new com.nbis.fluoj.persistence.Type(null);
+                unknown.setName("None");
 		types.add(unknown);
-		com.nbis.fluoj.persistence.Type all = new com.nbis.fluoj.persistence.Type(0, "Any");
+		com.nbis.fluoj.persistence.Type all = new com.nbis.fluoj.persistence.Type((short)0);
+                all.setName("Any");
 		types.add(0, all);
 		originalcb.setModel(new DefaultComboBoxModel(types.toArray()));
 		winnercb.setModel(new DefaultComboBoxModel(types.toArray()));
@@ -456,8 +459,8 @@ public class ReviewJFrame extends OutputJFrame implements ActionListener
 	
 	private void filterOutput()
 	{
-		int original = ((com.nbis.fluoj.persistence.Type) originalcb.getSelectedItem()).getIdtype();
-		int winner = ((com.nbis.fluoj.persistence.Type) winnercb.getSelectedItem()).getIdtype();
+		short original = ((com.nbis.fluoj.persistence.Type) originalcb.getSelectedItem()).getIdtype();
+		short winner = ((com.nbis.fluoj.persistence.Type) winnercb.getSelectedItem()).getIdtype();
 		canvas.reload(classifier.getScells(ir.getIdimage(), original, winner, em));
 	}
 

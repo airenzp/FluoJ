@@ -30,7 +30,7 @@ import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 import com.nbis.fluoj.classifier.CellTypeProbability;
 
 /**
- * Displays {@link persistence.Scell} info including {@link persistence.Scellfeature}, {@link persistence.Ftprobability}
+ * Displays {@link persistence.Scell} info including {@link persistence.ScellFeature}, {@link persistence.Probability}
  * @author Airen
  *
  */
@@ -55,7 +55,7 @@ public class CImageTableJFrame extends JFrame {
 	}
 	
 	
-	public CImageTableJFrame(Classifier classifier, int idimage, Integer original, Integer winner)
+	public CImageTableJFrame(Classifier classifier, int idimage, Short original, Short winner)
 	{
 		try
 		{
@@ -153,7 +153,7 @@ public class CImageTableJFrame extends JFrame {
 			column_names.add("X");
 			column_names.add("Y");
 			for(int i = 0; i < features.size(); i ++)
-				column_names.add(features.get(i).getFeature());
+				column_names.add(features.get(i).getName());
 			column_names.add("Probability");
 			
 			probs = new ArrayList<List<CellTypeProbability>>();
@@ -195,21 +195,21 @@ public class CImageTableJFrame extends JFrame {
 			int index;
 			Double prob;
 			NumberFormat formatter;
-			Integer idtype = 0;
+			Short idtype = 0;
 			List<CellTypeProbability> stprobs;
 			for(int y = 0, j = 0; y < rows.length - magnification + 1; y += magnification, j ++)
 			{
 				s = scells.get(j);
 				rows[y][0] = s.getIdscell();
-				rows[y][1] = s.getSession().getIdsession();
+				rows[y][1] = s.getIdimage().getIdsample().getIdsession();
 				rows[y][2] = s.getDate();
-				rows[y][3] = s.getImageresource().getName();
-				rows[y][4] = (s.getType() != null)? s.getType().getName(): null;
-				rows[y][5] = (s.getType1() != null) ? s.getType1().getName(): null;
-				rows[y][6] = s.getXPosition();
-				rows[y][7] = s.getYPosition();
+				rows[y][3] = s.getIdimage().getName();
+				rows[y][4] = (s.getIdtype() != null)? s.getIdtype().getName(): null;
+				rows[y][5] = (s.getWinner() != null) ? s.getWinner().getName(): null;
+				rows[y][6] = s.getX();
+				rows[y][7] = s.getY();
 				for(int x = 8, i = 0; x < 8 + features.size(); x ++, i ++)
-					rows[y][x] = getFeatureValue(s.getScellfeatureList(), features.get(i).getIdfeature());
+					rows[y][x] = getFeatureValue(s.getScellFeatureList(), features.get(i).getIdfeature());
 				for(int k = 0; k < types.size(); k ++)
 				{
 					rows[y + k + 1][4] = types.get(k).getName();
@@ -237,10 +237,10 @@ public class CImageTableJFrame extends JFrame {
 			}
 		}
 		
-		private Object getFeatureValue(Collection<Scellfeature> values, Integer idfeature)
+		private Object getFeatureValue(Collection<ScellFeature> values, Short idfeature)
 		{
-			Iterator<Scellfeature> iter = values.iterator();
-			Scellfeature ssf;
+			Iterator<ScellFeature> iter = values.iterator();
+			ScellFeature ssf;
 			while(iter.hasNext())
 			{
 				ssf = iter.next();

@@ -1,112 +1,96 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.nbis.fluoj.persistence;
 
-import ij.ImagePlus;
-
-import java.awt.Image;
-import java.io.File;
 import java.io.Serializable;
 import java.util.List;
-
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.nbis.fluoj.classifier.ConfigurationDB;
-
+/**
+ *
+ * @author airen
+ */
 @Entity
-@Table(name = "SAMPLE")
+@Table(name = "sample", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"idtype"})})
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Sample.findAll", query = "SELECT s FROM Sample s"),
     @NamedQuery(name = "Sample.findByIdsample", query = "SELECT s FROM Sample s WHERE s.idsample = :idsample"),
     @NamedQuery(name = "Sample.findByName", query = "SELECT s FROM Sample s WHERE s.name = :name"),
-    @NamedQuery(name = "Sample.findByThreshold", query = "SELECT s FROM Sample s WHERE s.threshold = :threshold"),
-    @NamedQuery(name = "Sample.findByRoismax", query = "SELECT s FROM Sample s WHERE s.roismax = :roismax"),
-	@NamedQuery(name = "Sample.findByFillholes", query = "SELECT s FROM Sample s WHERE s.fillholes = :fillholes"),
-	@NamedQuery(name = "Sample.findByRoisthreshold", query = "SELECT s FROM Sample s WHERE s.roisthreshold = :roisthreshold")})
+    @NamedQuery(name = "Sample.findByImageThreshold", query = "SELECT s FROM Sample s WHERE s.imageThreshold = :imageThreshold"),
+    @NamedQuery(name = "Sample.findByRoisThreshold", query = "SELECT s FROM Sample s WHERE s.roisThreshold = :roisThreshold"),
+    @NamedQuery(name = "Sample.findByFillHoles", query = "SELECT s FROM Sample s WHERE s.fillHoles = :fillHoles"),
+    @NamedQuery(name = "Sample.findByExpansionRadius", query = "SELECT s FROM Sample s WHERE s.expansionRadius = :expansionRadius")})
 public class Sample implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "IDSAMPLE")
-    private Integer idsample;
-    @Column(name = "NAME")
+    @Column(name = "idsample", nullable = false)
+    private Short idsample;
+    @Column(name = "name", length = 50)
     private String name;
-    @Basic(optional = false)
-    @Column(name = "THRESHOLD")
-    private int threshold;
-    @JoinColumn(name = "SEPARATION", referencedColumnName = "IDSEPARATION")
-    @ManyToOne(optional = false)
-    private Separation separation;
-    @Column(name = "ROISMax")
-    private Integer roismax;
-    @Basic(optional = false)
-    @Column(name = "FILLHOLES")
-    private int fillholes;
-    @Column(name = "EXPANSIONRADIUS")
-    private Integer expansionradius;
-    @Column(name = "ROISTHRESHOLD")
-    private Integer roisthreshold;
-    @JoinColumn(name = "DTYPE", referencedColumnName = "IDTYPE")
-    @ManyToOne
-    private Type type;
-    @JoinColumn(name = "PSESSION", referencedColumnName = "IDSESSION")
-    @ManyToOne
-    private Session session;
-    @JoinColumn(name = "IDIMAGE", referencedColumnName = "IDIMAGE")
-    @ManyToOne(optional = false)
-    private Imageresource imageresource;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
-    private List<Samplefilter> samplefilterList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
-    private List<Cell> cellList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
-    private List<Samplecorefeature> samplecorefeatureList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
-    private List<Samplefeature> samplefeatureList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
+    @Column(name = "image_threshold")
+    private Short imageThreshold;
+    @Column(name = "rois_threshold")
+    private Short roisThreshold;
+    @Column(name = "fill_holes")
+    private Boolean fillHoles;
+    @Column(name = "expansion_radius")
+    private Short expansionRadius;
+    @OneToMany(mappedBy = "idsample")
     private List<Session> sessionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
+    private List<SampleFeature> sampleFeatureList;
+    @OneToMany(mappedBy = "idsample")
     private List<Type> typeList;
+    @JoinColumn(name = "idimage", referencedColumnName = "idimage")
+    @ManyToOne
+    private SampleImage idimage;
+    @JoinColumn(name = "idseparation", referencedColumnName = "idseparation")
+    @ManyToOne
+    private Separation idseparation;
+    @JoinColumn(name = "idsession", referencedColumnName = "idsession")
+    @ManyToOne
+    private Session idsession;
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype", nullable = false)
+    @OneToOne(optional = false)
+    private Type idtype;
+    @OneToMany(mappedBy = "idsample")
+    private List<Filter> filterList;
+    @OneToMany(mappedBy = "idsample")
+    private List<SampleImage> sampleImageList;
 
     public Sample() {
     }
 
-    public Sample(Integer idsample) {
+    public Sample(Short idsample) {
         this.idsample = idsample;
     }
 
-    public Sample(Integer idsample, int threshold, int fillholes) {
-        this.idsample = idsample;
-        this.threshold = threshold;
-        this.fillholes = fillholes;
-    }
-
-    public Integer getIdsample() {
+    public Short getIdsample() {
         return idsample;
     }
 
-    public void setIdsample(Integer idsample) {
+    public void setIdsample(Short idsample) {
         this.idsample = idsample;
     }
 
@@ -118,97 +102,36 @@ public class Sample implements Serializable {
         this.name = name;
     }
 
-    
-
-    public int getThreshold() {
-        return threshold;
+    public Short getImageThreshold() {
+        return imageThreshold;
     }
 
-    public void setThreshold(int threshold) {
-        this.threshold = threshold;
+    public void setImageThreshold(Short imageThreshold) {
+        this.imageThreshold = imageThreshold;
     }
 
-    public Separation getSeparation() {
-        return separation;
+    public Short getRoisThreshold() {
+        return roisThreshold;
     }
 
-    public void setSeparation(Separation separation) {
-        this.separation = separation;
+    public void setRoisThreshold(Short roisThreshold) {
+        this.roisThreshold = roisThreshold;
     }
 
-    public Integer getRoismax() {
-        return roismax;
+    public Boolean getFillHoles() {
+        return fillHoles;
     }
 
-    public void setRoismax(Integer roismax) {
-        this.roismax = roismax;
+    public void setFillHoles(Boolean fillHoles) {
+        this.fillHoles = fillHoles;
     }
 
-    public int getFillholes() {
-        return fillholes;
+    public Short getExpansionRadius() {
+        return expansionRadius;
     }
 
-    public void setFillholes(int fillholes) {
-        this.fillholes = fillholes;
-    }
-
-
-    public Integer getExpansionradius() {
-        return expansionradius;
-    }
-
-    public void setExpansionradius(Integer expansionradius) {
-        this.expansionradius = expansionradius;
-    }
-
-    public Integer getRoisthreshold() {
-        return roisthreshold;
-    }
-
-    public void setRoisthreshold(Integer roisthreshold) {
-        this.roisthreshold = roisthreshold;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    public Imageresource getImageresource() {
-        return imageresource;
-    }
-
-    public void setImageresource(Imageresource imageresource) {
-        this.imageresource = imageresource;
-    }
-
-    @XmlTransient
-    public List<Cell> getCellList() {
-        return cellList;
-    }
-
-    public void setCellList(List<Cell> cellList) {
-        this.cellList = cellList;
-    }
-
-    @XmlTransient
-    public List<Samplefeature> getSamplefeatureList() {
-        return samplefeatureList;
-    }
-
-    public void setSamplefeatureList(List<Samplefeature> samplefeatureList) {
-        this.samplefeatureList = samplefeatureList;
+    public void setExpansionRadius(Short expansionRadius) {
+        this.expansionRadius = expansionRadius;
     }
 
     @XmlTransient
@@ -221,6 +144,15 @@ public class Sample implements Serializable {
     }
 
     @XmlTransient
+    public List<SampleFeature> getSampleFeatureList() {
+        return sampleFeatureList;
+    }
+
+    public void setSampleFeatureList(List<SampleFeature> sampleFeatureList) {
+        this.sampleFeatureList = sampleFeatureList;
+    }
+
+    @XmlTransient
     public List<Type> getTypeList() {
         return typeList;
     }
@@ -228,23 +160,55 @@ public class Sample implements Serializable {
     public void setTypeList(List<Type> typeList) {
         this.typeList = typeList;
     }
-    
+
+    public SampleImage getIdimage() {
+        return idimage;
+    }
+
+    public void setIdimage(SampleImage idimage) {
+        this.idimage = idimage;
+    }
+
+    public Separation getIdseparation() {
+        return idseparation;
+    }
+
+    public void setIdseparation(Separation idseparation) {
+        this.idseparation = idseparation;
+    }
+
+    public Session getIdsession() {
+        return idsession;
+    }
+
+    public void setIdsession(Session idsession) {
+        this.idsession = idsession;
+    }
+
+    public Type getIdtype() {
+        return idtype;
+    }
+
+    public void setIdtype(Type idtype) {
+        this.idtype = idtype;
+    }
+
     @XmlTransient
-    public List<Samplefilter> getSamplefilterList() {
-        return samplefilterList;
+    public List<Filter> getFilterList() {
+        return filterList;
     }
 
-    public void setSamplefilterList(List<Samplefilter> samplefilterList) {
-        this.samplefilterList = samplefilterList;
+    public void setFilterList(List<Filter> filterList) {
+        this.filterList = filterList;
     }
 
     @XmlTransient
-    public List<Samplecorefeature> getSamplecorefeatureList() {
-        return samplecorefeatureList;
+    public List<SampleImage> getSampleImageList() {
+        return sampleImageList;
     }
 
-    public void setSamplecorefeatureList(List<Samplecorefeature> samplecorefeatureList) {
-        this.samplecorefeatureList = samplecorefeatureList;
+    public void setSampleImageList(List<SampleImage> sampleImageList) {
+        this.sampleImageList = sampleImageList;
     }
 
     @Override
@@ -253,7 +217,7 @@ public class Sample implements Serializable {
         hash += (idsample != null ? idsample.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -268,38 +232,10 @@ public class Sample implements Serializable {
     }
 
     @Override
- 	public String toString() {
- 		return name;
- 	}
-
- 	public Icon getIcon() {
-
- 		Icon icon;
- 		String file;
- 		if (getImageresource() == null
- 				|| !(new File(getImageresource().getPath()).exists()))
- 			file = ConfigurationDB.resourcesdir + File.separator + "no-image.jpg";
- 		else
- 			file = getImageresource().getPath();
- 		Image image = new ImagePlus(file).getImage().getScaledInstance(100,
- 				100, Image.SCALE_SMOOTH);
- 		icon = new ImageIcon(image);
-
- 		return icon;
- 	}
- 	
- 	public static Icon getDefaultIcon()
- 	{
- 		String file = "plugins/FluoJ/resources" + File.separator + "no-image.jpg";
- 		Image image = new ImagePlus(file).getImage().getScaledInstance(100,
- 				100, Image.SCALE_SMOOTH);
- 		return  new ImageIcon(image);
- 	}
- 	
- 	public int getBordersThreshold()
- 	{
- 		return (int)(2.5 * getThreshold());
- 	}
- 	
- 	
+    public String toString() {
+        return "com.nbis.fluoj.persistence.Sample[ idsample=" + idsample + " ]";
+    }
+    
+    
+    
 }

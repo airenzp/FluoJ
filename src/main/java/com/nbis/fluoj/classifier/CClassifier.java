@@ -31,8 +31,8 @@ public class CClassifier
 	{
 		this.cdb = cdb;
 		features = 0;
-		for (Samplefeature sf : cdb.getSample().getSamplefeatureList())
-			if (sf.getUseonclassification() == 1)
+		for (SampleFeature sf : cdb.getSample().getSampleFeatureList())
+			if (sf.getActive())
 				features++;
 	}
 
@@ -41,7 +41,7 @@ public class CClassifier
 		EntityManager em = ConfigurationDB.getEM();
 		Classifier c = ConfigurationDB.getInstance().getPersistentClassifier(1, em);
 		List<Scell> scells;
-		Scellfeature ssf;
+		ScellFeature ssf;
 
 		em.getTransaction().begin();
 		try
@@ -49,7 +49,7 @@ public class CClassifier
 			scells = c.getScells(em);
 			for (Scell ss : scells)
 			{
-				for (Scellfeature ssf2 : ss.getScellfeatureList())
+				for (ScellFeature ssf2 : ss.getScellFeatureList())
 					if (ssf2.getFeature().getIdfeature() == 20)
 					{
 						ssf2.setValue(Math.pow(ssf2.getValue(), 2));
@@ -160,7 +160,7 @@ public class CClassifier
 					winner = getWinner(probs);
 					ss = (Scell) em.find(Scell.class, current);
 					st = (winner != null) ? (Type) em.find(Type.class, winner) : null;
-					ss.setType1(st);
+					ss.setIdtype(st);
 					em.merge(ss);
 					// scdb.getUpdateWinnerQuery(current, winner,
 					// em).executeUpdate();
@@ -223,7 +223,7 @@ public class CClassifier
 	{
 		
 //		int limit = Math.round(0.075f * features);
-//		for(CellTypeProbability prob: probs)
+//		for(Probability prob: probs)
 //			if(prob.probability != bestprob && Math.abs(Math.getExponent((prob.probability/bestprob))) <= limit)
 //				return true;
 		return false;

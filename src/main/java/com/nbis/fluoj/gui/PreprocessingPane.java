@@ -21,13 +21,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplefilter;
+import com.nbis.fluoj.persistence.Filter;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 
 public class PreprocessingPane extends JPanel
 {
 
-	private List<Samplefilter> filters;
+	private List<Filter> filters;
 	private JTable filterstb;
 	private FiltersTableModel filtersmd;
 	private ConfigurationJFrame frame;
@@ -37,7 +37,7 @@ public class PreprocessingPane extends JPanel
 	private boolean changed = false;
 	private Sample sample;
 
-	public PreprocessingPane(ConfigurationJFrame frame, Sample sample, List<Samplefilter> filters)
+	public PreprocessingPane(ConfigurationJFrame frame, Sample sample, List<Filter> filters)
 	{
 		this.sample = sample;
 		this.frame = frame;
@@ -45,7 +45,7 @@ public class PreprocessingPane extends JPanel
 		initComponents();
 	}
 
-	List<Samplefilter> getFilters()
+	List<Filter> getFilters()
 	{
 		return filters;
 	}
@@ -103,7 +103,7 @@ public class PreprocessingPane extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				deleteSamplefilter();
+				deleteFilter();
 
 			}
 		});
@@ -115,23 +115,23 @@ public class PreprocessingPane extends JPanel
 		buttonspn.add(bt);
 	}
 
-	private void deleteSamplefilter()
+	private void deleteFilter()
 	{
 		int index = filterstb.getSelectedRow();
-		Samplefilter sf = filters.get(index);
+		Filter sf = filters.get(index);
 		if (sf.getCommand().equals("8-bit"))
 			return;
 
 		filters.remove(sf);
 		if(sample != null)
-			ConfigurationDB.removeSampleFilterOnDB(sf, frame.getEntityManager());
+			ConfigurationDB.removeFilterOnDB(sf, frame.getEntityManager());
 		deletebt.setEnabled(false);
 		filtersmd.fireTableRowsDeleted(index, index);
 		changed = true;
 		frame.resetCImageProcess();
 	}
 
-	public void addSamplefilter(Samplefilter sf)
+	public void addFilter(Filter sf)
 	{
 		int index = filters.size();
 		filters.add(sf);
@@ -178,11 +178,11 @@ public class PreprocessingPane extends JPanel
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
 			String text = (String) value;
-			Samplefilter f = filters.get(rowIndex);
+			Filter f = filters.get(rowIndex);
 			if (columnIndex == 0)
 				f.setCommand(text);
 			if (columnIndex == 1)
-				f.setCommandoptions(text);
+				f.setOptions(text);
 			
 
 		}
@@ -190,11 +190,11 @@ public class PreprocessingPane extends JPanel
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-			Samplefilter f = filters.get(rowIndex);
+			Filter f = filters.get(rowIndex);
 			if (columnIndex == 0)
 				return f.getCommand();
 			if (columnIndex == 1)
-				return f.getCommandoptions();
+				return f.getOptions();
 			return null;
 
 		}

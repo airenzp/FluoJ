@@ -67,8 +67,8 @@ public class ComparisonTableModel extends AbstractTableModel {
 		for(int rowIndex = 0; rowIndex < types.size() ; rowIndex ++)
 			for(int columnIndex = 1; columnIndex <= types.size() ; columnIndex ++)
 			{
-					int original = types.get(columnIndex - 1).getIdtype();
-					int winner = types.get(rowIndex).getIdtype();
+					short original = types.get(columnIndex - 1).getIdtype();
+					short winner = types.get(rowIndex).getIdtype();
 					values[rowIndex][columnIndex] = classifier.getTotal(original, winner);
 			}
 	}

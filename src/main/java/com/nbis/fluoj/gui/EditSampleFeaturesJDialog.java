@@ -27,8 +27,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.Samplecorefeature;
-import com.nbis.fluoj.persistence.Samplefeature;
+import com.nbis.fluoj.persistence.SampleFeature;
+import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.Classifier;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
@@ -41,14 +41,14 @@ public class EditSampleFeaturesJDialog extends JDialog
 	private FeaturesTableModel sfeaturesmd;
 	private FluoJJFrame frame;
 	private JButton okbt;
-	private List<Samplefeature> sfeatures;
+	private List<SampleFeature> sfeatures;
 	private JButton addbt;
 	private JButton deletebt;
 	private int features;
 	private Sample sample;
 	private JTable scorefeaturestb;
 	private CoreFeaturesTableModel scorefeaturesmd;
-	private List<Samplecorefeature> scorefeatures;
+	private List<SampleFeature> scorefeatures;
 	private JButton addcorebt;
 	private JButton deletecorebt;
 	private double positionx = 0.5;
@@ -79,8 +79,8 @@ public class EditSampleFeaturesJDialog extends JDialog
 		this.frame = frame;
 		this.em = em;
 		sample = frame.getSample();
-		sfeatures = frame.getSample().getSamplefeatureList();
-		scorefeatures = frame.getSample().getSamplecorefeatureList();
+		sfeatures = frame.getSample().getSampleFeatureList();
+		scorefeatures = frame.getSample().getSampleFeatureList();
 		initComponents();
 	}
 
@@ -332,9 +332,9 @@ public class EditSampleFeaturesJDialog extends JDialog
 			try
 			{
 				int index = sfeaturestb.getSelectedRow();
-				Samplefeature sf = sfeatures.get(index);
+				SampleFeature sf = sfeatures.get(index);
 				sfeatures.remove(sf);
-				ConfigurationDB.removeSamplefeature(sf, em);
+				ConfigurationDB.removeSampleFeature(sf, em);
 				deletebt.setEnabled(false);
 				sfeaturesmd.fireTableRowsDeleted(index, index);
 			}
@@ -351,7 +351,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 			try
 			{
 				int index = scorefeaturestb.getSelectedRow();
-				Samplecorefeature sf = scorefeatures.get(index);
+				SampleFeature sf = scorefeatures.get(index);
 				scorefeatures.remove(sf);
 				ConfigurationDB.remove(sf, em);
 				deletecorebt.setEnabled(false);
@@ -407,14 +407,14 @@ public class EditSampleFeaturesJDialog extends JDialog
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
-			Samplefeature f = sfeatures.get(rowIndex);
+			SampleFeature f = sfeatures.get(rowIndex);
 			if (columnIndex == 4)
 			{
 
 				Boolean use = (Boolean) value;
-				f.setUseonclassification(use ? 1 : 0);
+				f.setActive(use);
 
-				sfeatures.set(sfeatures.indexOf(f), (Samplefeature)ConfigurationDB.merge(f, em));
+				sfeatures.set(sfeatures.indexOf(f), (SampleFeature)ConfigurationDB.merge(f, em));
 				if (!frame.cconfigurationdb.isEmpty(sample))
 				{
 					int result = JOptionPane
@@ -445,7 +445,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 							f.setMax(d);
 						}
 					}
-					sfeatures.set(sfeatures.indexOf(f), (Samplefeature)ConfigurationDB.merge(f, em));
+					sfeatures.set(sfeatures.indexOf(f), (SampleFeature)ConfigurationDB.merge(f, em));
 				}
 			}
 		}
@@ -454,7 +454,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
 
-			Samplefeature f = sfeatures.get(rowIndex);
+			SampleFeature f = sfeatures.get(rowIndex);
 
 			if (columnIndex == 0)
 				return f.getFeature();
@@ -465,7 +465,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 			if (columnIndex == 3)
 				return String.format("%.2f", f.getMax());
 			if (columnIndex == 4)
-				return f.getUseonclassification() != 0;
+				return f.getActive();
 
 			return null;
 		}
@@ -512,7 +512,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex)
 		{
-			Samplecorefeature f = scorefeatures.get(rowIndex);
+			SampleFeature f = scorefeatures.get(rowIndex);
 
 			int result = frame.resetDB();
 			if (result == JOptionPane.YES_OPTION)// edition allowed
@@ -532,7 +532,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 					f.setMax(d);
 				}
 
-				scorefeatures.set(scorefeatures.indexOf(f), (Samplecorefeature)ConfigurationDB.merge(f, em));
+				scorefeatures.set(scorefeatures.indexOf(f), (SampleFeature)ConfigurationDB.merge(f, em));
 				frame.resetCImageProcess();
 			}
 
@@ -542,10 +542,10 @@ public class EditSampleFeaturesJDialog extends JDialog
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
 
-			Samplecorefeature f = scorefeatures.get(rowIndex);
+			SampleFeature f = scorefeatures.get(rowIndex);
 
 			if (columnIndex == 0)
-				return f.getFeature().getFeature();
+				return f.getFeature().getName();
 			if (columnIndex == 1)
 				return f.getFeature().getDescription();
 			if (columnIndex == 2)
@@ -559,7 +559,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 
 	}
 
-	public List<Samplefeature> getSamplefeatures()
+	public List<SampleFeature> getSampleFeatures()
 	{
 		return sfeatures;
 	}
@@ -569,7 +569,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 		return frame.getSample();
 	}
 
-	public void addSamplefeature(Samplefeature sf)
+	public void addSampleFeature(SampleFeature sf)
 	{
 		int index = sfeatures.size();
 		sfeatures.add(sf);
@@ -578,14 +578,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 
 	}
 
-	public void addSamplecorefeature(Samplecorefeature sf)
-	{
-		int index = scorefeatures.size();
-		scorefeatures.add(sf);
-		ConfigurationDB.persist(sf, em);
-		scorefeaturesmd.fireTableRowsInserted(index, index);
-		
-	}
+	
 
 	public double getLocationX()
 	{

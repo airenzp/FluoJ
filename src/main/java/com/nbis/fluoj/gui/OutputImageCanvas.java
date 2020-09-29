@@ -2,34 +2,19 @@ package com.nbis.fluoj.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-
-import javax.swing.JOptionPane;
 
 import com.nbis.fluoj.persistence.*;
 
-import com.nbis.fluoj.classifier.FluoJImageProcessor;
-import com.nbis.fluoj.classifier.Classifier;
-import com.nbis.fluoj.classifier.ParticleStatistic;
 import com.nbis.fluoj.classifier.SegmentedParticle;
-import com.nbis.fluoj.classifier.CellProcessor;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 
 import ij.IJ;
-import ij.ImageJ;
-import ij.ImagePlus;
-import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
-import ij.gui.Toolbar;
-import ij.process.ImageProcessor;
 
 /**
  * ImageCanvas customized to display {@link classifier.SegmentedParticle ImageLabels}
@@ -58,11 +43,11 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 		particles = cip.getFilteredParticles();
 		for (Scell ss : scells) 
 		{
-			particle = cip.getMotif(particles,	new Point(ss.getXPosition(), ss.getYPosition()));
+			particle = cip.getMotif(particles,	new Point(ss.getX(), ss.getY()));
 			if(particle != null)
 				particle.setScell(ss);
 			else
-				System.out.printf("%s, %s\n", ss.getXPosition(), ss.getYPosition());
+				System.out.printf("%s, %s\n", ss.getX(), ss.getY());
 
 		}
 
@@ -98,7 +83,7 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 			rframe.enableUpdate();
 			if (!e.isControlDown())//user accessing particle info
 			{
-				ss.setType(rframe.getActiveType());
+				ss.setIdtype(rframe.getActiveType());
 			}
 			repaint();
 			rframe.updateAllCounts();
@@ -121,23 +106,23 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 		int y0 = (int) getSrcRect().getY();
 		for (int i = 0; i < scells.size(); i++) {
 			s = scells.get(i);
-			x = (int) ((s.getXPosition() - x0) * magnification);
-			y = (int) ((s.getYPosition() - y0) * magnification);
+			x = (int) ((s.getX() - x0) * magnification);
+			y = (int) ((s.getY() - y0) * magnification);
 			label = "no";
 			color = Color.LIGHT_GRAY;
-			if (s.getType() != null)
+			if (s.getIdtype() != null)
 			{
-				label = s.getType().getLabel();
-				color = new Color(s.getType().getColor());
+				label = s.getIdtype().getLabel();
+				color = new Color(s.getIdtype().getColor());
 			}
 			g2.setColor(color);
 			g2.drawString(label, x,	y - 10);
 			label = "no";
 			color = Color.LIGHT_GRAY;
-			if (s.getType1() != null)
+			if (s.getWinner() != null)
 			{
-				label = s.getType1().getLabel();
-				color = new Color(s.getType1().getColor());
+				label = s.getWinner().getLabel();
+				color = new Color(s.getWinner().getColor());
 			}
 			g2.setColor(color);
 			g2.drawString(label, x, y);
@@ -147,7 +132,7 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 	public void resetClassification() {
 		
 		for (int i = 0; i < scells.size(); i++)
-			scells.get(i).setType(null);
+			scells.get(i).setIdtype(null);
 		repaint();
 	}
 

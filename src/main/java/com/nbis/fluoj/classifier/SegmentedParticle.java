@@ -6,16 +6,11 @@ import ij.process.ImageProcessor;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 
 import com.nbis.fluoj.persistence.*;
 
@@ -51,7 +46,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 		return typed;
 	}
 
-	public void setSample(Sample sample)
+	public void setIdsample(Sample sample)
 	{
 		this.sample = sample;
 	}
@@ -143,7 +138,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 		return false;
 	}
 
-	public void filterROIS(List<Samplecorefeature> scfs)
+	public void filterROIS(List<SampleFeature> scfs)
 	{
 		List<SegmentedParticle> validrois = new ArrayList<SegmentedParticle>();
 		if (rois == null || rois.isEmpty())
@@ -157,7 +152,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 			{
 				valid = true;
 				ps = new ParticleStatistic(roi);
-				for (Samplecorefeature scf : scfs)
+				for (SampleFeature scf : scfs)
 				{
 					value = ps.getValue(scf.getFeature().getIdfeature());
 					if (value < scf.getMin() || value > scf.getMax())
@@ -173,20 +168,20 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 		}
 	}
 
-	public boolean isValid(List<Samplefeature> sfs)
+	public boolean isValid(List<SampleFeature> sfs)
 	{
-		if (sample.getRoismax() > 0)
+		if (sample.getRoisThreshold() > 0)
 		{
 			if (rois == null || rois.isEmpty())
 				return false;// label must have inner particles
-			else if (rois.size() > sample.getRoismax())
+			else if (rois.size() > sample.getRoisThreshold())
 				return false;
 		}
 		else if (rois != null || rois.isEmpty())
 			return false;
 		Double value;
 		if (sfs != null)
-			for (Samplefeature sf : sfs)
+			for (SampleFeature sf : sfs)
 			{
 				CellInfo ci = getCellInfo(typed);
 				value = ci.getValue(sf.getFeature().getIdfeature());
@@ -231,9 +226,9 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 		String str = String.format("%30s: %8s\n", "x", ci.getX0());
 		str += String.format("%30s: %8s\n", "y", ci.getY0());
 		str += String.format("%30s: %8s\n", "label", label);
-		if (sample.getSamplefeatureList() != null)
-			for (Samplefeature sf : sample.getSamplefeatureList())
-				str += String.format("%30s: %8.2f\n", sf.getFeature().getFeature(), ci.getValue(sf.getFeature().getIdfeature()));
+		if (sample.getSampleFeatureList() != null)
+			for (SampleFeature sf : sample.getSampleFeatureList())
+				str += String.format("%30s: %8.2f\n", sf.getFeature(), ci.getValue(sf.getFeature().getIdfeature()));
 		return str;
 	}
 
@@ -268,7 +263,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle>
 		int[] corecolor = new int[] { 0, 255, 0 };
 		for (ParticlePoint point : getCellInfo().getPpoints())
 			processor.putPixel(point.x - x0, point.y - y0, color);
-		if (sample.getRoismax() > 0)
+		if (sample.getRoisThreshold()> 0)
 			for (ParticlePoint point : getCellInfo().getIPPoints())
 				processor.putPixel(point.x - x0, point.y - y0, corecolor);
 		ImagePlus imp = new ImagePlus("", processor);
