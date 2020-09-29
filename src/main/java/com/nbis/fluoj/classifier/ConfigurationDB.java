@@ -26,6 +26,7 @@ import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
 import ij.ImagePlus;
 import java.awt.Image;
+import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -46,7 +47,6 @@ public class ConfigurationDB extends DB {
     public static final Type nonetype = ConfigurationDB.getNoneType();
     public static final String fluojdir = "plugins" + File.separator + "FluoJ" + File.separator;
     public static final String imagesdir = fluojdir + "images";
-    public static final String resourcesdir = fluojdir + "resources";
     public static final String propertiesfile = fluojdir + "FluoJ.properties";
     private static Properties props;
     private static String unrelatedFeaturesQuery = "Select f from Feature f where f.idfeature not in "
@@ -126,6 +126,8 @@ public class ConfigurationDB extends DB {
     public Sample getRandomSample() {
         EntityManager em = getEM();
         List<Sample> samples = getSamples(em);
+        if(samples.isEmpty())
+            throw new IllegalArgumentException("No samples provided");
         int index = (int) Math.floor(Math.random() * samples.size());
         Sample s = samples.get(index);
         em.close();
@@ -438,7 +440,7 @@ public class ConfigurationDB extends DB {
 
     public List<Sample> getTrainedSamples(EntityManager em) {
         return em
-                .createQuery("Select sa from Sample sa where sa.session is not null and sa.session.idsession in (select sc.session.idsession from Scell sc)")
+                .createQuery("Select sa from Sample sa where sa.idsession is not null and sa.idsession in (select sc.idsession from Scell sc)")
                 .getResultList();
     }
 
@@ -598,10 +600,9 @@ public class ConfigurationDB extends DB {
 
         Icon icon;
         String file;
-        if (image == null
-                || !(new File(image.getPath()).exists())) {
-            file = ConfigurationDB.resourcesdir + File.separator + "no-image.jpg";
-        } else {
+        if (image == null)
+            return getDefaultIcon();
+        else {
             file = image.getPath();
         }
         Image icon_image = new ImagePlus(file).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
@@ -611,10 +612,10 @@ public class ConfigurationDB extends DB {
     }
 
     public static Icon getDefaultIcon() {
-        String file = "plugins/FluoJ/resources" + File.separator + "no-image.jpg";
-        Image image = new ImagePlus(file).getImage().getScaledInstance(100,
-                100, Image.SCALE_SMOOTH);
-        return new ImageIcon(image);
+        URL file = ConfigurationDB.class.getResource("/no-image.jpg");
+        if(file == null)
+            throw new IllegalArgumentException("Resource not found");
+        return new ImageIcon(file);
     }
 
 }

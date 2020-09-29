@@ -26,10 +26,11 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.cell (
     idcell integer NOT NULL,
-    x smallint,
-    y smallint,
+    x integer,
+    y integer,
     date date,
-    idimage smallint
+    idimage smallint,
+    idtype smallint
 );
 
 
@@ -42,26 +43,11 @@ ALTER TABLE public.cell OWNER TO fluoj;
 CREATE TABLE public.cell_feature (
     idcell integer NOT NULL,
     idfeature smallint NOT NULL,
-    value real
+    value double precision
 );
 
 
 ALTER TABLE public.cell_feature OWNER TO fluoj;
-
---
--- Name: cell_type; Type: TABLE; Schema: public; Owner: fluoj
---
-
-CREATE TABLE public.cell_type (
-    idcell_type smallint NOT NULL,
-    name character varying(50),
-    label character varying(50),
-    color character varying(50),
-    training_min smallint
-);
-
-
-ALTER TABLE public.cell_type OWNER TO fluoj;
 
 --
 -- Name: feature; Type: TABLE; Schema: public; Owner: fluoj
@@ -70,7 +56,8 @@ ALTER TABLE public.cell_type OWNER TO fluoj;
 CREATE TABLE public.feature (
     idfeature smallint NOT NULL,
     name character varying(50) NOT NULL,
-    description character varying(500)
+    description character varying(500),
+    roi boolean
 );
 
 
@@ -91,29 +78,15 @@ CREATE TABLE public.filter (
 ALTER TABLE public.filter OWNER TO fluoj;
 
 --
--- Name: image; Type: TABLE; Schema: public; Owner: fluoj
---
-
-CREATE TABLE public.image (
-    idimage integer NOT NULL,
-    date date,
-    name character varying(50),
-    idsample smallint
-);
-
-
-ALTER TABLE public.image OWNER TO fluoj;
-
---
 -- Name: probability; Type: TABLE; Schema: public; Owner: fluoj
 --
 
 CREATE TABLE public.probability (
-    idcell_type smallint NOT NULL,
+    idtype smallint NOT NULL,
     idfeature smallint NOT NULL,
-    x smallint,
+    x integer,
     frequence integer,
-    probability real
+    probability double precision
 );
 
 
@@ -126,7 +99,14 @@ ALTER TABLE public.probability OWNER TO fluoj;
 CREATE TABLE public.sample (
     idsample smallint NOT NULL,
     name character varying(50),
-    image_threshold smallint
+    image_threshold smallint,
+    rois_threshold smallint,
+    fill_holes boolean,
+    idsession smallint,
+    expansion_radius smallint,
+    idseparation smallint,
+    idimage integer,
+    idtype smallint NOT NULL
 );
 
 
@@ -139,14 +119,27 @@ ALTER TABLE public.sample OWNER TO fluoj;
 CREATE TABLE public.sample_feature (
     idsample smallint NOT NULL,
     idfeature smallint NOT NULL,
-    min real,
-    max real,
-    active boolean,
-    internal boolean
+    min double precision,
+    max double precision,
+    active boolean
 );
 
 
 ALTER TABLE public.sample_feature OWNER TO fluoj;
+
+--
+-- Name: sample_image; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.sample_image (
+    idimage integer NOT NULL,
+    date date,
+    name character varying(50),
+    idsample smallint
+);
+
+
+ALTER TABLE public.sample_image OWNER TO fluoj;
 
 --
 -- Name: scell; Type: TABLE; Schema: public; Owner: fluoj
@@ -154,9 +147,13 @@ ALTER TABLE public.sample_feature OWNER TO fluoj;
 
 CREATE TABLE public.scell (
     idscell integer NOT NULL,
-    x smallint,
-    y smallint,
-    idimage integer
+    x integer,
+    y integer,
+    idimage integer,
+    idtype smallint,
+    date date,
+    winner smallint,
+    idsession smallint
 );
 
 
@@ -169,18 +166,30 @@ ALTER TABLE public.scell OWNER TO fluoj;
 CREATE TABLE public.scell_feature (
     idscell integer NOT NULL,
     idfeature smallint NOT NULL,
-    value real
+    value double precision
 );
 
 
 ALTER TABLE public.scell_feature OWNER TO fluoj;
 
 --
+-- Name: separation; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.separation (
+    idseparation smallint NOT NULL,
+    name character varying(50)
+);
+
+
+ALTER TABLE public.separation OWNER TO fluoj;
+
+--
 -- Name: session; Type: TABLE; Schema: public; Owner: fluoj
 --
 
 CREATE TABLE public.session (
-    idsession smallint NOT NULL,
+    idsession integer NOT NULL,
     name character varying(50),
     date date,
     idsample smallint
@@ -190,10 +199,26 @@ CREATE TABLE public.session (
 ALTER TABLE public.session OWNER TO fluoj;
 
 --
+-- Name: type; Type: TABLE; Schema: public; Owner: fluoj
+--
+
+CREATE TABLE public.type (
+    idtype smallint NOT NULL,
+    name character varying(50),
+    label character varying(50),
+    training_min integer,
+    idsample smallint,
+    color integer
+);
+
+
+ALTER TABLE public.type OWNER TO fluoj;
+
+--
 -- Data for Name: cell; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.cell (idcell, x, y, date, idimage) FROM stdin;
+COPY public.cell (idcell, x, y, date, idimage, idtype) FROM stdin;
 \.
 
 
@@ -206,18 +231,10 @@ COPY public.cell_feature (idcell, idfeature, value) FROM stdin;
 
 
 --
--- Data for Name: cell_type; Type: TABLE DATA; Schema: public; Owner: fluoj
---
-
-COPY public.cell_type (idcell_type, name, label, color, training_min) FROM stdin;
-\.
-
-
---
 -- Data for Name: feature; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.feature (idfeature, name, description) FROM stdin;
+COPY public.feature (idfeature, name, description, roi) FROM stdin;
 \.
 
 
@@ -230,18 +247,10 @@ COPY public.filter (idfilter, command, options, idsample) FROM stdin;
 
 
 --
--- Data for Name: image; Type: TABLE DATA; Schema: public; Owner: fluoj
---
-
-COPY public.image (idimage, date, name, idsample) FROM stdin;
-\.
-
-
---
 -- Data for Name: probability; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.probability (idcell_type, idfeature, x, frequence, probability) FROM stdin;
+COPY public.probability (idtype, idfeature, x, frequence, probability) FROM stdin;
 \.
 
 
@@ -249,7 +258,7 @@ COPY public.probability (idcell_type, idfeature, x, frequence, probability) FROM
 -- Data for Name: sample; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.sample (idsample, name, image_threshold) FROM stdin;
+COPY public.sample (idsample, name, image_threshold, rois_threshold, fill_holes, idsession, expansion_radius, idseparation, idimage, idtype) FROM stdin;
 \.
 
 
@@ -257,7 +266,15 @@ COPY public.sample (idsample, name, image_threshold) FROM stdin;
 -- Data for Name: sample_feature; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.sample_feature (idsample, idfeature, min, max, active, internal) FROM stdin;
+COPY public.sample_feature (idsample, idfeature, min, max, active) FROM stdin;
+\.
+
+
+--
+-- Data for Name: sample_image; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.sample_image (idimage, date, name, idsample) FROM stdin;
 \.
 
 
@@ -265,7 +282,7 @@ COPY public.sample_feature (idsample, idfeature, min, max, active, internal) FRO
 -- Data for Name: scell; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
-COPY public.scell (idscell, x, y, idimage) FROM stdin;
+COPY public.scell (idscell, x, y, idimage, idtype, date, winner, idsession) FROM stdin;
 \.
 
 
@@ -278,10 +295,26 @@ COPY public.scell_feature (idscell, idfeature, value) FROM stdin;
 
 
 --
+-- Data for Name: separation; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.separation (idseparation, name) FROM stdin;
+\.
+
+
+--
 -- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: fluoj
 --
 
 COPY public.session (idsession, name, date, idsample) FROM stdin;
+\.
+
+
+--
+-- Data for Name: type; Type: TABLE DATA; Schema: public; Owner: fluoj
+--
+
+COPY public.type (idtype, name, label, training_min, idsample, color) FROM stdin;
 \.
 
 
@@ -302,11 +335,11 @@ ALTER TABLE ONLY public.cell
 
 
 --
--- Name: cell_type cell_type_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+-- Name: type cell_type_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
 --
 
-ALTER TABLE ONLY public.cell_type
-    ADD CONSTRAINT cell_type_pkey PRIMARY KEY (idcell_type);
+ALTER TABLE ONLY public.type
+    ADD CONSTRAINT cell_type_pkey PRIMARY KEY (idtype);
 
 
 --
@@ -326,10 +359,10 @@ ALTER TABLE ONLY public.filter
 
 
 --
--- Name: image image_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+-- Name: sample_image image_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
 --
 
-ALTER TABLE ONLY public.image
+ALTER TABLE ONLY public.sample_image
     ADD CONSTRAINT image_pkey PRIMARY KEY (idimage);
 
 
@@ -338,7 +371,7 @@ ALTER TABLE ONLY public.image
 --
 
 ALTER TABLE ONLY public.probability
-    ADD CONSTRAINT probability_pkey PRIMARY KEY (idcell_type, idfeature);
+    ADD CONSTRAINT probability_pkey PRIMARY KEY (idtype, idfeature);
 
 
 --
@@ -347,6 +380,14 @@ ALTER TABLE ONLY public.probability
 
 ALTER TABLE ONLY public.sample_feature
     ADD CONSTRAINT sample_feature_pkey PRIMARY KEY (idsample, idfeature);
+
+
+--
+-- Name: sample sample_idtype_key; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_idtype_key UNIQUE (idtype);
 
 
 --
@@ -371,6 +412,14 @@ ALTER TABLE ONLY public.scell_feature
 
 ALTER TABLE ONLY public.scell
     ADD CONSTRAINT scell_pkey PRIMARY KEY (idscell);
+
+
+--
+-- Name: separation separation_pkey; Type: CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.separation
+    ADD CONSTRAINT separation_pkey PRIMARY KEY (idseparation);
 
 
 --
@@ -402,7 +451,7 @@ ALTER TABLE ONLY public.cell_feature
 --
 
 ALTER TABLE ONLY public.cell
-    ADD CONSTRAINT cell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+    ADD CONSTRAINT cell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.sample_image(idimage);
 
 
 --
@@ -410,7 +459,15 @@ ALTER TABLE ONLY public.cell
 --
 
 ALTER TABLE ONLY public.cell
-    ADD CONSTRAINT cell_idimage_fkey1 FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+    ADD CONSTRAINT cell_idimage_fkey1 FOREIGN KEY (idimage) REFERENCES public.sample_image(idimage);
+
+
+--
+-- Name: cell cell_idtype_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.cell
+    ADD CONSTRAINT cell_idtype_fkey FOREIGN KEY (idtype) REFERENCES public.type(idtype);
 
 
 --
@@ -422,10 +479,10 @@ ALTER TABLE ONLY public.filter
 
 
 --
--- Name: image image_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+-- Name: sample_image image_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
 --
 
-ALTER TABLE ONLY public.image
+ALTER TABLE ONLY public.sample_image
     ADD CONSTRAINT image_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
 
 
@@ -434,7 +491,7 @@ ALTER TABLE ONLY public.image
 --
 
 ALTER TABLE ONLY public.probability
-    ADD CONSTRAINT probability_idcell_type_fkey FOREIGN KEY (idcell_type) REFERENCES public.cell_type(idcell_type);
+    ADD CONSTRAINT probability_idcell_type_fkey FOREIGN KEY (idtype) REFERENCES public.type(idtype);
 
 
 --
@@ -462,11 +519,83 @@ ALTER TABLE ONLY public.sample_feature
 
 
 --
+-- Name: sample sample_idimage_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.sample_image(idimage);
+
+
+--
+-- Name: sample sample_idseparation_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_idseparation_fkey FOREIGN KEY (idseparation) REFERENCES public.separation(idseparation);
+
+
+--
+-- Name: sample sample_idsession_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_idsession_fkey FOREIGN KEY (idsession) REFERENCES public.session(idsession);
+
+
+--
+-- Name: sample sample_idtype_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.sample
+    ADD CONSTRAINT sample_idtype_fkey FOREIGN KEY (idtype) REFERENCES public.type(idtype);
+
+
+--
+-- Name: scell_feature scell_feature_idfeature_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell_feature
+    ADD CONSTRAINT scell_feature_idfeature_fkey FOREIGN KEY (idfeature) REFERENCES public.feature(idfeature);
+
+
+--
+-- Name: scell_feature scell_feature_idscell_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell_feature
+    ADD CONSTRAINT scell_feature_idscell_fkey FOREIGN KEY (idscell) REFERENCES public.scell(idscell);
+
+
+--
+-- Name: scell scell_idcell_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell
+    ADD CONSTRAINT scell_idcell_type_fkey FOREIGN KEY (idtype) REFERENCES public.type(idtype);
+
+
+--
 -- Name: scell scell_idimage_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
 --
 
 ALTER TABLE ONLY public.scell
-    ADD CONSTRAINT scell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.image(idimage);
+    ADD CONSTRAINT scell_idimage_fkey FOREIGN KEY (idimage) REFERENCES public.sample_image(idimage);
+
+
+--
+-- Name: scell scell_idsession_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell
+    ADD CONSTRAINT scell_idsession_fkey FOREIGN KEY (idsession) REFERENCES public.session(idsession);
+
+
+--
+-- Name: scell scell_winner_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.scell
+    ADD CONSTRAINT scell_winner_fkey FOREIGN KEY (winner) REFERENCES public.type(idtype);
 
 
 --
@@ -475,6 +604,14 @@ ALTER TABLE ONLY public.scell
 
 ALTER TABLE ONLY public.session
     ADD CONSTRAINT session_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
+
+
+--
+-- Name: type type_idsample_fkey; Type: FK CONSTRAINT; Schema: public; Owner: fluoj
+--
+
+ALTER TABLE ONLY public.type
+    ADD CONSTRAINT type_idsample_fkey FOREIGN KEY (idsample) REFERENCES public.sample(idsample);
 
 
 --

@@ -28,7 +28,6 @@ import com.nbis.fluoj.persistence.ScellFeature;
 import com.nbis.fluoj.persistence.ScellFeaturePK;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
-
 /**
  * {@link classifier.ClassifierDB} provides specific functions for session data
  * management.
