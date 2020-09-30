@@ -126,8 +126,9 @@ public class ConfigurationDB extends DB {
     public Sample getRandomSample() {
         EntityManager em = getEM();
         List<Sample> samples = getSamples(em);
-        if(samples.isEmpty())
+        if (samples.isEmpty()) {
             throw new IllegalArgumentException("No samples provided");
+        }
         int index = (int) Math.floor(Math.random() * samples.size());
         Sample s = samples.get(index);
         em.close();
@@ -595,15 +596,22 @@ public class ConfigurationDB extends DB {
     public static String getPath(SampleImage image) {
         return ConfigurationDB.imagesdir + File.separator + image.getIdimage() + ".tif";
     }
+    
+    
+    public static ImagePlus getImagePlus(SampleImage image) {
+        if(image == null)
+            return null;
+        return new ImagePlus(getPath(image));
+    }
 
     public static Icon getIcon(SampleImage image) {
 
         Icon icon;
         String file;
-        if (image == null)
+        if (image == null) {
             return getDefaultIcon();
-        else {
-            file = image.getPath();
+        } else {
+            file = getPath(image);
         }
         Image icon_image = new ImagePlus(file).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         icon = new ImageIcon(icon_image);
@@ -613,8 +621,9 @@ public class ConfigurationDB extends DB {
 
     public static Icon getDefaultIcon() {
         URL file = ConfigurationDB.class.getResource("/no-image.jpg");
-        if(file == null)
+        if (file == null) {
             throw new IllegalArgumentException("Resource not found");
+        }
         return new ImageIcon(file);
     }
 

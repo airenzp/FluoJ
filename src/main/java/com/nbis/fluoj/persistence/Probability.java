@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Probability.findAll", query = "SELECT p FROM Probability p"),
-    @NamedQuery(name = "Probability.findByIdcellType", query = "SELECT p FROM Probability p WHERE p.probabilityPK.idcellType = :idcellType"),
+    @NamedQuery(name = "Probability.findByIdtype", query = "SELECT p FROM Probability p WHERE p.probabilityPK.idtype = :idtype"),
     @NamedQuery(name = "Probability.findByIdfeature", query = "SELECT p FROM Probability p WHERE p.probabilityPK.idfeature = :idfeature"),
     @NamedQuery(name = "Probability.findByX", query = "SELECT p FROM Probability p WHERE p.x = :x"),
     @NamedQuery(name = "Probability.findByFrequence", query = "SELECT p FROM Probability p WHERE p.frequence = :frequence"),
@@ -45,7 +45,7 @@ public class Probability implements Serializable {
     @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Feature feature;
-    @JoinColumn(name = "idcell_type", referencedColumnName = "idtype", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Type type;
 
@@ -56,8 +56,8 @@ public class Probability implements Serializable {
         this.probabilityPK = probabilityPK;
     }
 
-    public Probability(short idcellType, short idfeature) {
-        this.probabilityPK = new ProbabilityPK(idcellType, idfeature);
+    public Probability(short idtype, short idfeature) {
+        this.probabilityPK = new ProbabilityPK(idtype, idfeature);
     }
 
     public ProbabilityPK getProbabilityPK() {

@@ -5,15 +5,14 @@
  */
 package com.nbis.fluoj.persistence;
 
-import com.nbis.fluoj.classifier.ConfigurationDB;
-import ij.ImagePlus;
-import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -42,6 +41,7 @@ public class SampleImage implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "idimage", nullable = false)
     private Integer idimage;
@@ -148,20 +148,7 @@ public class SampleImage implements Serializable {
 
     @Override
     public String toString() {
-        return "SampleImage[ idimage=" + idimage + " ]";
+        return "com.nbis.fluoj.persistence.SampleImage[ idimage=" + idimage + " ]";
     }
-    
-    public ImagePlus getImagePlus() {
-        if (idimage == null) {
-            return null;
-        }
-        return new ImagePlus(getPath());
-    }
-
-    public String getPath() {
-        return ConfigurationDB.imagesdir + File.separator + idimage + ".tif";
-
-    }
-
     
 }

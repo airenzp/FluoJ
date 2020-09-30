@@ -18,8 +18,8 @@ import javax.persistence.Embeddable;
 public class ProbabilityPK implements Serializable {
 
     @Basic(optional = false)
-    @Column(name = "idcell_type", nullable = false)
-    private short idcellType;
+    @Column(name = "idtype", nullable = false)
+    private short idtype;
     @Basic(optional = false)
     @Column(name = "idfeature", nullable = false)
     private short idfeature;
@@ -27,17 +27,17 @@ public class ProbabilityPK implements Serializable {
     public ProbabilityPK() {
     }
 
-    public ProbabilityPK(short idcellType, short idfeature) {
-        this.idcellType = idcellType;
+    public ProbabilityPK(short idtype, short idfeature) {
+        this.idtype = idtype;
         this.idfeature = idfeature;
     }
 
-    public short getIdcellType() {
-        return idcellType;
+    public short getIdtype() {
+        return idtype;
     }
 
-    public void setIdcellType(short idcellType) {
-        this.idcellType = idcellType;
+    public void setIdtype(short idtype) {
+        this.idtype = idtype;
     }
 
     public short getIdfeature() {
@@ -51,7 +51,7 @@ public class ProbabilityPK implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) idcellType;
+        hash += (int) idtype;
         hash += (int) idfeature;
         return hash;
     }
@@ -63,7 +63,7 @@ public class ProbabilityPK implements Serializable {
             return false;
         }
         ProbabilityPK other = (ProbabilityPK) object;
-        if (this.idcellType != other.idcellType) {
+        if (this.idtype != other.idtype) {
             return false;
         }
         if (this.idfeature != other.idfeature) {
@@ -74,7 +74,7 @@ public class ProbabilityPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.ProbabilityPK[ idcellType=" + idcellType + ", idfeature=" + idfeature + " ]";
+        return "com.nbis.fluoj.persistence.ProbabilityPK[ idtype=" + idtype + ", idfeature=" + idfeature + " ]";
     }
     
 }

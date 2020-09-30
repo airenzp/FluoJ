@@ -90,6 +90,14 @@
             <version>9.3.jdbc4-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <type>jar</type>
+        </dependency>
+
     </dependencies>
     <!--
 <build>

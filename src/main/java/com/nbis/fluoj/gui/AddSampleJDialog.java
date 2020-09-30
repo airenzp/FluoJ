@@ -162,7 +162,7 @@ public class AddSampleJDialog extends JDialog
 		segmentationpn.add(new JLabel("Separate:"), FluoJUtils.getConstraints(constraints, 0, 3, 1));
 		separations = ConfigurationDB.getIdseparations(parent.getEntityManager());
 		separationscb = new JComboBox(separations.toArray());
-		separationscb.setSelectedItem(separations.get(2));//none separation
+		//separationscb.setSelectedItem(separations.get(2));//none separation
 		segmentationpn.add(separationscb, FluoJUtils.getConstraints(constraints, 1, 3, 1));
 
 		segmentationpn.add(new JLabel("Expansion Radius:"), FluoJUtils.getConstraints(constraints, 0, 4, 1));

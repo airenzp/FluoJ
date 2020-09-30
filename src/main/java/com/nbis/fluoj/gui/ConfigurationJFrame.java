@@ -399,12 +399,13 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     @Override
     public FluoJImageProcessor getCImageProcess() throws InvalidOperationOnResourceException {
+        ImagePlus imp = ConfigurationDB.getImagePlus(sample.getIdimage());
         if (cip == null)// reseted or first time
         {
-            cip = new FluoJImageProcessor(sample.getIdimage().getImagePlus(), sample, false, cconfigurationdb.isDebug());
+            cip = new FluoJImageProcessor(imp, sample, false, cconfigurationdb.isDebug());
         }
         if (cip.getSample() != sample) {
-            cip = new FluoJImageProcessor(sample.getIdimage().getImagePlus(), sample, false, cconfigurationdb.isDebug());
+            cip = new FluoJImageProcessor(imp, sample, false, cconfigurationdb.isDebug());
         }
         return cip;
     }
