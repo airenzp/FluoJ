@@ -64,9 +64,9 @@ public class AddSampleFeatureJDialog extends JDialog {
 		add(new JLabel("Feature"),
 				FluoJUtils.getConstraints(constraints, 0, 0, 1));
 
-		
-		featurecb = new JComboBox(ConfigurationDB.getAvailableFeatures(
-				parent.getSample(), em).toArray());
+		List<Feature> sfavailable = ConfigurationDB.getAvailableFeatures(
+				parent.getSample(), em);
+		featurecb = new JComboBox(sfavailable.toArray());
 
 		add(featurecb, FluoJUtils.getConstraints(constraints, 1, 0, 1));
 		feature = (Feature) featurecb.getSelectedItem();
@@ -142,7 +142,7 @@ public class AddSampleFeatureJDialog extends JDialog {
 				sf.setMax(max);
 				frame.resetCImageProcess();
 				try {
-					frame.processImageParticles(sfs, sample.getSampleFeatureList());
+					frame.processImageParticles(sfs);
 				} catch (InvalidOperationOnResourceException e1) {
 					JOptionPane.showMessageDialog(AddSampleFeatureJDialog.this, e1.getMessage());
 				}

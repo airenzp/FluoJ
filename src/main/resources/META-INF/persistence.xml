@@ -2,23 +2,7 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="com.nbis_FluoJ2_jar_1.0-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <class>com.nbis.fluoj.entities.Cell</class>
-    <class>com.nbis.fluoj.entities.Filter</class>
-    <class>com.nbis.fluoj.entities.Session</class>
-    <class>com.nbis.fluoj.entities.CellType</class>
-    <class>com.nbis.fluoj.entities.CellFeature</class>
-    <class>com.nbis.fluoj.entities.ScellFeature</class>
-    <class>com.nbis.fluoj.entities.Image</class>
-    <class>com.nbis.fluoj.entities.Probability</class>
-    <class>com.nbis.fluoj.entities.Scell</class>
-    <class>com.nbis.fluoj.entities.Feature</class>
-    <class>com.nbis.fluoj.entities.SampleFeature</class>
-    <class>com.nbis.fluoj.entities.Sample</class>
-    <class>com.nbis.fluoj.persistence.SampleFeature_1</class>
-    <class>com.nbis.fluoj.persistence.Feature_1</class>
-    <class>com.nbis.fluoj.persistence.Sample_1</class>
     <class>com.nbis.fluoj.persistence.Cell</class>
-    <class>com.nbis.fluoj.persistence.Image</class>
     <class>com.nbis.fluoj.persistence.Sample</class>
     <class>com.nbis.fluoj.persistence.CellFeature</class>
     <class>com.nbis.fluoj.persistence.Probability</class>
@@ -26,24 +10,12 @@
     <class>com.nbis.fluoj.persistence.SampleFeature</class>
     <class>com.nbis.fluoj.persistence.Filter</class>
     <class>com.nbis.fluoj.persistence.Feature</class>
-    <class>com.nbis.fluoj.persistence.CellType</class>
     <class>com.nbis.fluoj.persistence.Scell</class>
     <class>com.nbis.fluoj.persistence.Session</class>
-    <class>com.nbis.fluoj.gui.Scell</class>
-    <class>com.nbis.fluoj.gui.CellFeature</class>
-    <class>com.nbis.fluoj.gui.Cell</class>
-    <class>com.nbis.fluoj.gui.Filter</class>
-    <class>com.nbis.fluoj.gui.CellType</class>
-    <class>com.nbis.fluoj.gui.SampleImage</class>
-    <class>com.nbis.fluoj.gui.Session</class>
-    <class>com.nbis.fluoj.gui.Sample</class>
-    <class>com.nbis.fluoj.gui.SampleFeature</class>
-    <class>com.nbis.fluoj.gui.ScellFeature</class>
-    <class>com.nbis.fluoj.gui.Probability</class>
-    <class>com.nbis.fluoj.gui.Feature</class>
     <class>com.nbis.fluoj.persistence.SampleImage</class>
     <class>com.nbis.fluoj.persistence.Type</class>
     <class>com.nbis.fluoj.persistence.Separation</class>
+    <class>com.nbis.fluoj.persistence.SampleFilter</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/fluoj"/>
       <property name="javax.persistence.jdbc.user" value="fluoj"/>

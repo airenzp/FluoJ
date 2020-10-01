@@ -38,8 +38,6 @@ import javax.swing.table.TableCellEditor;
 import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
 import com.nbis.fluoj.persistence.SampleFeature;
-import com.nbis.fluoj.persistence.SampleFeature;
-import com.nbis.fluoj.persistence.Filter;
 import com.nbis.fluoj.persistence.Separation;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.classifier.Classifier;
@@ -278,7 +276,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                     return;
                 }
                 try {
-                    processImageParticles(new FluoJImageProcessor(img, sample, false, cconfigurationdb.isDebug()), sample.getSampleFeatureList(), sample.getSampleFeatureList());
+                    processImageParticles(new FluoJImageProcessor(img, sample, false, cconfigurationdb.isDebug()), sample.getSampleFeatureList());
                 } catch (InvalidOperationOnResourceException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -348,18 +346,18 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     void processImageParticles() throws InvalidOperationOnResourceException {
 
-        processImageParticles(getCImageProcess(), sample.getSampleFeatureList(), sample.getSampleFeatureList());
+        processImageParticles(getCImageProcess(), sample.getSampleFeatureList());
 
     }
 
-    void processImageParticles(List<SampleFeature> sfs, List<SampleFeature> scfs) throws InvalidOperationOnResourceException {
+    void processImageParticles(List<SampleFeature> sfs) throws InvalidOperationOnResourceException {
 
-        processImageParticles(getCImageProcess(), sfs, scfs);
+        processImageParticles(getCImageProcess(), sfs);
 
     }
 
-    public void processImageParticles(FluoJImageProcessor cip, List<SampleFeature> sfs, List<SampleFeature> scfs) throws InvalidOperationOnResourceException {
-        cip.filterParticles(sfs, scfs);
+    public void processImageParticles(FluoJImageProcessor cip, List<SampleFeature> sfs) throws InvalidOperationOnResourceException {
+        cip.filterParticles(sfs);
         display(cip);
 
     }

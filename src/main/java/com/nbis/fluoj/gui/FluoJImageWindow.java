@@ -14,8 +14,6 @@ import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 
 import ij.IJ;
-import ij.ImagePlus;
-import ij.Menus;
 import ij.WindowManager;
 import ij.gui.ImageCanvas;
 import ij.gui.ImageWindow;
@@ -90,8 +88,6 @@ public class FluoJImageWindow extends ImageWindow implements KeyListener
 	{
 		// if (IJ.isMacintosh())
 		// this.setMenuBar(Menus.getMenuBar());
-		if (IJ.debugMode)
-			IJ.write(imp.getTitle() + ": Activated");
 		if (!closed)
 		{
 			// ic.requestFocus();

@@ -74,8 +74,8 @@ public class Sample implements Serializable {
     @JoinColumn(name = "idsession", referencedColumnName = "idsession")
     @ManyToOne
     private Session idsession;
-    @JoinColumn(name = "idtype", referencedColumnName = "idtype", nullable = false)
-    @OneToOne(optional = false)
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype")
+    @OneToOne
     private Type idtype;
     @OneToMany(mappedBy = "idsample")
     private List<Filter> filterList;
@@ -236,7 +236,7 @@ public class Sample implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Sample[ idsample=" + idsample + " ]";
+        return name;
     }
     
 }

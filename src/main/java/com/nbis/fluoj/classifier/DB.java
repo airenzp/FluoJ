@@ -19,6 +19,8 @@ import com.nbis.fluoj.persistence.SampleImage;
 import com.nbis.fluoj.persistence.Sample;
 import com.nbis.fluoj.persistence.Session;
 import com.nbis.fluoj.persistence.Type;
+import java.util.HashMap;
+import org.eclipse.persistence.jpa.PersistenceProvider;
 
 /**
  * DB is general class for classifier database persistence API. Inheriting
@@ -42,7 +44,8 @@ public abstract class DB {
 				Runtime.getRuntime().addShutdownHook(new Thread(cleaner));
 			}
 			if (emf == null || !emf.isOpen()) {
-				emf = Persistence.createEntityManagerFactory(pu);
+                                HashMap properties = new HashMap();
+				emf = new PersistenceProvider().createEntityManagerFactory(pu, properties);
 				cleaner.addEMF(emf);
 			}
 			emf.getCache().evictAll();//to force new entity manager to read information from db

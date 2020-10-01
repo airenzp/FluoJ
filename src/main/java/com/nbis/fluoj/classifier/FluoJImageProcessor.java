@@ -218,7 +218,7 @@ public class FluoJImageProcessor
 
 				}
 			System.out.println("Filtering Particles");
-			filterParticles(sample.getSampleFeatureList(), sample.getSampleFeatureList());
+			filterParticles(sample.getSampleFeatureList());
 
 			System.out.println("Segmentation ended");
 		}
@@ -276,7 +276,7 @@ public class FluoJImageProcessor
 		return grayimp;
 	}
 
-	public void filterParticles(List<SampleFeature> sfs, List<SampleFeature> scfs)
+	public void filterParticles(List<SampleFeature> sfs)
 	{
 		System.out.println("Starting to filter particles");
 		filteredparticles = new ArrayList<SegmentedParticle>();
@@ -285,7 +285,7 @@ public class FluoJImageProcessor
 			if (sample.getExpansionRadius() > 0)
 				addBorders(il, sample.getExpansionRadius());
 			if (sample.getRoisThreshold() > 0)
-				il.filterROIS(scfs);
+				il.filterROIS(sfs);
 			if (!il.onBorder() && il.isValid(sfs))
 				filteredparticles.add(il);
 		}
@@ -488,7 +488,7 @@ public class FluoJImageProcessor
 
 	public void filterParticles()
 	{
-		filterParticles(sample.getSampleFeatureList(), sample.getSampleFeatureList());
+		filterParticles(sample.getSampleFeatureList());
 
 	}
 

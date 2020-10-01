@@ -80,7 +80,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 		this.em = em;
 		sample = frame.getSample();
 		sfeatures = frame.getSample().getSampleFeatureList();
-		scorefeatures = frame.getSample().getSampleFeatureList();
+		scorefeatures = ConfigurationDB.getCorefeatures(frame.getSample(), em);
 		initComponents();
 	}
 
@@ -453,7 +453,6 @@ public class EditSampleFeaturesJDialog extends JDialog
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-
 			SampleFeature f = sfeatures.get(rowIndex);
 
 			if (columnIndex == 0)
@@ -541,7 +540,7 @@ public class EditSampleFeaturesJDialog extends JDialog
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex)
 		{
-
+                        System.out.println(String.format("roi %s %s", rowIndex, columnIndex));
 			SampleFeature f = scorefeatures.get(rowIndex);
 
 			if (columnIndex == 0)

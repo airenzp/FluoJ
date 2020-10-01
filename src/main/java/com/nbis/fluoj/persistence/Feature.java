@@ -160,7 +160,7 @@ public class Feature implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Feature[ idfeature=" + idfeature + " ]";
+        return name;
     }
     
 }

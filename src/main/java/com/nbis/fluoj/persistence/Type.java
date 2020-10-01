@@ -61,7 +61,7 @@ public class Type implements Serializable {
     @JoinColumn(name = "idsample", referencedColumnName = "idsample")
     @ManyToOne
     private Sample idsample;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "idtype")
+    @OneToOne(mappedBy = "idtype")
     private Sample sample;
     @OneToMany(mappedBy = "idtype")
     private List<Scell> scellList;

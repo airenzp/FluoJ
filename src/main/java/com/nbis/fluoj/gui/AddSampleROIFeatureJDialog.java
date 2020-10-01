@@ -137,7 +137,7 @@ public class AddSampleROIFeatureJDialog extends JDialog {
 				sf.setMax(max);
 				frame.resetCImageProcess();
 				try {
-					frame.processImageParticles(sample.getSampleFeatureList(), scfs);
+					frame.processImageParticles(sample.getSampleFeatureList());
 				} catch (InvalidOperationOnResourceException e1) {
 					JOptionPane.showMessageDialog(AddSampleROIFeatureJDialog.this, e1.getMessage());
 				}

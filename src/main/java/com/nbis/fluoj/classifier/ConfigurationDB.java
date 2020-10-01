@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -17,7 +16,6 @@ import java.util.logging.Level;
 import javax.persistence.EntityManager;
 import com.nbis.fluoj.persistence.Feature;
 import com.nbis.fluoj.persistence.Sample;
-import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Filter;
 import com.nbis.fluoj.persistence.SampleImage;
@@ -45,14 +43,13 @@ public class ConfigurationDB extends DB {
     private static Type dtype;
     public static final Session anysession = ConfigurationDB.getNoneSession();
     public static final Type nonetype = ConfigurationDB.getNoneType();
-    public static final String fluojdir = "plugins" + File.separator + "FluoJ" + File.separator;
+    public static final String fluojdir = "FluoJ" + File.separator;
     public static final String imagesdir = fluojdir + "images";
     public static final String propertiesfile = fluojdir + "FluoJ.properties";
     private static Properties props;
-    private static String unrelatedFeaturesQuery = "Select f from Feature f where f.idfeature not in "
-            + "(select sf.feature.idfeature from SampleFeature sf where sf.sample.idsample = :idsample)";
-    private static String unrelatedCoreFeaturesQuery = "Select f from Feature f where f.idfeature not in "
-            + "(select sf.feature.idfeature from SampleFeature sf where sf.sample.idsample = :idsample)";
+    private static String unrelatedFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = FALSE and (sf.sample <> :sample or sf.sample is NULL)";
+    private static String unrelatedCoreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and (sf.sample <> :sample or sf.sample is NULL)";
+    private static String coreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and sf.sample = :sample";
 
     public static void main(String[] args) {
         EntityManager em = ConfigurationDB.getEM();
@@ -65,6 +62,12 @@ public class ConfigurationDB extends DB {
             cdb = new ConfigurationDB();
         }
         return cdb;
+    }
+    
+    ConfigurationDB()
+    {
+        new File(fluojdir).mkdir();
+        new File(imagesdir).mkdir();
     }
 
     private boolean debug = false;
@@ -535,20 +538,8 @@ public class ConfigurationDB extends DB {
 
     public static List<Feature> getAvailableFeatures(Sample sample, EntityManager em) {
         try {
-            List<Feature> features = em.createQuery(unrelatedFeaturesQuery).setParameter("idsample", sample.getIdsample()).getResultList();
-
-            if (sample.getRoisThreshold() != 0) {
-                return features;
-            }
-            //choose not mixed features
-            List<Feature> result = new ArrayList<Feature>();
-            for (Feature f : features) {
-                if (!f.getRoi()) {
-                    result.add(f);
-                }
-            }
-
-            return result;
+            List<Feature> features = em.createQuery(unrelatedFeaturesQuery).setParameter("sample", sample).getResultList();
+            return features;
 
         } catch (Exception e) {
             throw new CDBException(e.getMessage());
@@ -558,19 +549,18 @@ public class ConfigurationDB extends DB {
 
     public static List<Feature> getAvailableCorefeatures(Sample sample, EntityManager em) {
         try {
-            List<Feature> features = em.createQuery(unrelatedCoreFeaturesQuery).setParameter("idsample", sample.getIdsample()).getResultList();
+            List<Feature> features = em.createQuery(unrelatedCoreFeaturesQuery).setParameter("sample", sample).getResultList();
 
-            //choose not mixed features
-            List<Feature> result = new ArrayList<Feature>();
-            for (Feature f : features) {
-                if (f.getRoi()) {
-                    result.add(f);
-                }
-            }
-            return result;
+          
+            return features;
         } catch (Exception e) {
             throw new CDBException(e.getMessage());
         }
+    }
+    
+    public static List<SampleFeature> getCorefeatures(Sample sample, EntityManager em) {
+        List<SampleFeature> features = em.createQuery(coreFeaturesQuery).setParameter("sample", sample).getResultList();
+        return features;
     }
 
     public static Double getMinForFeatureOnSampleSession(Integer idsession, Short idfeature, EntityManager em) {

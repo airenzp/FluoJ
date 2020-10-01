@@ -56,10 +56,10 @@ public class FluoJUtils
 	{
 
 		// System.out.println("adding FluoJ tool");
-		if (IJ.getInstance() != null)
-		{
-			IJ.run("Install...", "install=plugins/FluoJ/FluoJMacros.txt");
-			IJ.setTool("FluoJ Tool");
-		}
+//		if (IJ.getInstance() != null)
+//		{
+//			IJ.run("Install...", "install=plugins/FluoJ/FluoJMacros.txt");
+//			IJ.setTool("FluoJ Tool");
+//		}
 	}
 }
