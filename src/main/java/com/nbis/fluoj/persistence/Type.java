@@ -189,7 +189,7 @@ public class Type implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Type[ idtype=" + idtype + " ]";
+        return name;
     }
     
 }

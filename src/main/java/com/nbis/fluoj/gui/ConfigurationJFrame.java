@@ -136,7 +136,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         samplestb.getColumnModel().getColumn(0).setPreferredWidth(150);// Name
         samplestb.getColumnModel().getColumn(1).setPreferredWidth(60);// Session
         samplestb.getColumnModel().getColumn(2).setPreferredWidth(70);// Threshold
-        samplestb.getColumnModel().getColumn(3).setPreferredWidth(100);// RoisThreshold
+        samplestb.getColumnModel().getColumn(3).setPreferredWidth(100);// RoisMax
         samplestb.getColumnModel().getColumn(4).setPreferredWidth(65);//Fill Holes
         samplestb.getColumnModel().getColumn(5).setPreferredWidth(115);// Separation
         samplestb.getColumnModel().getColumn(6).setPreferredWidth(80);// Exp radius
@@ -410,7 +410,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     class SampleTableModel extends AbstractTableModel {
 
-        private String[] columns = new String[]{"Name", "Session", "Threshold", "RoisThreshold",
+        private String[] columns = new String[]{"Name", "Session", "Threshold", "Rois Threshold",
             "Fill Holes", "Separate", "Expansion", "ROIsMax", "Default Type",};
 
         @Override
@@ -482,7 +482,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                     }
                 } else if (columnIndex == 3) {
                     if (value == null) {
-                        throw new IllegalArgumentException(Constants.getEmptyFieldMsg("threshold"));
+                        throw new IllegalArgumentException(Constants.getEmptyFieldMsg("rois threshold"));
                     }
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
@@ -518,7 +518,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                     Short roismax = (Short) value;
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
-                        sample.setRoisThreshold(roismax);
+                        sample.setRoisMax(roismax);
                         resetCImageProcess();
                     }
 
@@ -575,7 +575,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                 return sample.getExpansionRadius();
             }
             if (columnIndex == 7) {
-                return sample.getRoisThreshold();
+                return sample.getRoisMax();
             }
 
             if (columnIndex == 8) {

@@ -50,7 +50,8 @@ public class ConfigurationDB extends DB {
     private static String unrelatedFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = FALSE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String unrelatedCoreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String coreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and sf.sample = :sample";
-
+    private boolean debug = true;
+    
     public static void main(String[] args) {
         EntityManager em = ConfigurationDB.getEM();
         ConfigurationDB.getInstance().getSamples(em);
@@ -70,7 +71,7 @@ public class ConfigurationDB extends DB {
         new File(imagesdir).mkdir();
     }
 
-    private boolean debug = false;
+    
 
     /**
      * Obtains persistent {@link Session} associated to idsample.

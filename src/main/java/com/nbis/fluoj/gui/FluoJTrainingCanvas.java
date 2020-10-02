@@ -20,9 +20,9 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import com.nbis.fluoj.persistence.Type;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
-import com.nbis.fluoj.classifier.CellInfo;
 import com.nbis.fluoj.classifier.SegmentedParticle;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
+import com.nbis.fluoj.classifier.ParticleStatistic;
 
 /**
  * ImageCanvas customized to display {@link classifier.SegmentedParticle
@@ -53,11 +53,11 @@ public class FluoJTrainingCanvas extends FluoJImageCanvas {
 		int x = super.offScreenX(e.getX());
 		int y = super.offScreenY(e.getY());
 
-		SegmentedParticle il = cip.getMotif(ils, new Point(x, y));
+		SegmentedParticle il = cip.getParticle(ils, new Point(x, y));
 		if (il == null)
 			return;
 
-		CellInfo ci = il.getCellInfo();
+		ParticleStatistic ci = il.getParticleStatistic();
 		if(!e.isControlDown())
 			ci.setType(parent.getActiveType());
 		repaint();
@@ -75,22 +75,22 @@ public class FluoJTrainingCanvas extends FluoJImageCanvas {
 		String label;
 		int x0 = (int) getSrcRect().getX();
 		int y0 = (int) getSrcRect().getY();
-		CellInfo ci;
+		ParticleStatistic ci;
 		for (SegmentedParticle il : ils) {
-			ci = il.getCellInfo();
-			if (ci.getIdtype() == null)
+			ci = il.getParticleStatistic();
+			if (ci.getType() == null)
 				continue;
-			label = ci.getIdtype().getLabel();
-			x = (int) ((il.getCellInfo().getX0() - x0) * magnification);
-			y = (int) ((il.getCellInfo().getY0() - y0) * magnification);
-			g2.setColor(new Color(ci.getIdtype().getColor()));
+			label = ci.getType().getLabel();
+			x = (int) ((il.getParticleStatistic().getX0() - x0) * magnification);
+			y = (int) ((il.getParticleStatistic().getY0() - y0) * magnification);
+			g2.setColor(new Color(ci.getType().getColor()));
 			g2.drawString(label, x, y);
 		}
 	}
 
 	public void resetClassification() {
 		for (SegmentedParticle il : ils)
-			il.getCellInfo().setType(null);
+			il.getParticleStatistic().setType(null);
 		repaint();
 	}
 

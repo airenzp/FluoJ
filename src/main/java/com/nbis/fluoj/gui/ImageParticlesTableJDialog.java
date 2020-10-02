@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -19,33 +18,22 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
-import javax.persistence.EntityManager;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import com.nbis.fluoj.persistence.Feature;
 import com.nbis.fluoj.persistence.SampleFeature;
-import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
-import com.nbis.fluoj.classifier.CellInfo;
+import com.nbis.fluoj.classifier.ParticleStatistic;
 import com.nbis.fluoj.classifier.SegmentedParticle;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 
@@ -228,7 +216,7 @@ public class ImageParticlesTableJDialog extends JDialog {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			SegmentedParticle il = labels.get(rowIndex);
-			CellInfo info = il.getCellInfo();
+			ParticleStatistic info = il.getParticleStatistic();
 			if (columnIndex == 0)
 				return il.getIcon();
 			if (columnIndex == 1)

@@ -38,9 +38,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Sample.findByIdsample", query = "SELECT s FROM Sample s WHERE s.idsample = :idsample"),
     @NamedQuery(name = "Sample.findByName", query = "SELECT s FROM Sample s WHERE s.name = :name"),
     @NamedQuery(name = "Sample.findByImageThreshold", query = "SELECT s FROM Sample s WHERE s.imageThreshold = :imageThreshold"),
-    @NamedQuery(name = "Sample.findByRoisThreshold", query = "SELECT s FROM Sample s WHERE s.roisThreshold = :roisThreshold"),
+    @NamedQuery(name = "Sample.findByRoisMax", query = "SELECT s FROM Sample s WHERE s.roisMax = :roisMax"),
     @NamedQuery(name = "Sample.findByFillHoles", query = "SELECT s FROM Sample s WHERE s.fillHoles = :fillHoles"),
-    @NamedQuery(name = "Sample.findByExpansionRadius", query = "SELECT s FROM Sample s WHERE s.expansionRadius = :expansionRadius")})
+    @NamedQuery(name = "Sample.findByExpansionRadius", query = "SELECT s FROM Sample s WHERE s.expansionRadius = :expansionRadius"),
+    @NamedQuery(name = "Sample.findByRoisThreshold", query = "SELECT s FROM Sample s WHERE s.roisThreshold = :roisThreshold")})
 public class Sample implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -53,12 +54,14 @@ public class Sample implements Serializable {
     private String name;
     @Column(name = "image_threshold")
     private Short imageThreshold;
-    @Column(name = "rois_threshold")
-    private Short roisThreshold;
+    @Column(name = "rois_max")
+    private Short roisMax;
     @Column(name = "fill_holes")
     private Boolean fillHoles;
     @Column(name = "expansion_radius")
     private Short expansionRadius;
+    @Column(name = "rois_threshold")
+    private Short roisThreshold;
     @OneToMany(mappedBy = "idsample")
     private List<Session> sessionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sample")
@@ -113,12 +116,12 @@ public class Sample implements Serializable {
         this.imageThreshold = imageThreshold;
     }
 
-    public Short getRoisThreshold() {
-        return roisThreshold;
+    public Short getRoisMax() {
+        return roisMax;
     }
 
-    public void setRoisThreshold(Short roisThreshold) {
-        this.roisThreshold = roisThreshold;
+    public void setRoisMax(Short roisMax) {
+        this.roisMax = roisMax;
     }
 
     public Boolean getFillHoles() {
@@ -135,6 +138,14 @@ public class Sample implements Serializable {
 
     public void setExpansionRadius(Short expansionRadius) {
         this.expansionRadius = expansionRadius;
+    }
+
+    public Short getRoisThreshold() {
+        return roisThreshold;
+    }
+
+    public void setRoisThreshold(Short roisThreshold) {
+        this.roisThreshold = roisThreshold;
     }
 
     @XmlTransient

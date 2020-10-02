@@ -45,7 +45,7 @@ public class AddSampleFeatureJDialog extends JDialog {
 	private JCheckBox useonclassifchb;
 
 	public AddSampleFeatureJDialog(EditSampleFeaturesJDialog parent,
-			boolean modal, EntityManager em)
+			boolean modal, EntityManager em, boolean isrois)
 			throws InvalidOperationOnResourceException {
 		super(parent, modal);
 		setResizable(false);
@@ -63,9 +63,12 @@ public class AddSampleFeatureJDialog extends JDialog {
 
 		add(new JLabel("Feature"),
 				FluoJUtils.getConstraints(constraints, 0, 0, 1));
-
-		List<Feature> sfavailable = ConfigurationDB.getAvailableFeatures(
+                List<Feature> sfavailable;
+                if(!isrois)
+                    sfavailable = ConfigurationDB.getAvailableFeatures(
 				parent.getSample(), em);
+                else
+                    sfavailable = ConfigurationDB.getAvailableCorefeatures(sample, em);
 		featurecb = new JComboBox(sfavailable.toArray());
 
 		add(featurecb, FluoJUtils.getConstraints(constraints, 1, 0, 1));

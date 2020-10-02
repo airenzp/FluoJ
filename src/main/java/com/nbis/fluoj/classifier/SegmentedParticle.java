@@ -30,11 +30,11 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
 
     private List<SegmentedParticle> rois;
     private Scell scell;
-    private CellInfo info;
     private Sample sample;
     private boolean typed;
     private ImageProcessor grayip;
     private ImageProcessor segmentedip;
+    private ParticleStatistic ps;
 
     public Sample getSample() {
         return sample;
@@ -110,7 +110,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         points.add(point);
     }
 
-    public void addInnerIL(SegmentedParticle il) {
+    public void addROI(SegmentedParticle il) {
         if (rois == null) {
             rois = new ArrayList<SegmentedParticle>();
         }
@@ -129,54 +129,19 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return false;
     }
 
-    public void filterROIS(List<SampleFeature> sfs) {
-        List<SampleFeature> scfs = new ArrayList<SampleFeature>();
-        for (SampleFeature sf : sfs) {
-            if (sf.getFeature().getRoi()) {
-                scfs.add(sf);
-            }
-        }
-        List<SegmentedParticle> validrois = new ArrayList<SegmentedParticle>();
-        if (rois == null || rois.isEmpty()) {
-            return;
-        }
-        ParticleStatistic ps;
-        Double value;
-        boolean valid;
-        if (scfs != null && !scfs.isEmpty()) {
-            for (SegmentedParticle roi : rois) {
-                valid = true;
-                ps = new ParticleStatistic(roi);
-                for (SampleFeature scf : scfs) {
-                    value = ps.getValue(scf.getFeature().getIdfeature());
-                    if (value < scf.getMin() || value > scf.getMax()) {
-                        valid = false;
-                        break;
-                    }
-                }
-                if (valid) {
-                    validrois.add(roi);
-                }
-            }
-            rois = validrois;
-        }
-    }
-
+   
     public boolean isValid(List<SampleFeature> sfs) {
-        if (sample.getRoisThreshold() > 0) {
+        if (sample.getRoisMax() > 0) {
             if (rois == null || rois.isEmpty()) {
                 return false;// label must have inner particles
-            } else if (rois.size() > sample.getRoisThreshold()) {
+            } else if (rois.size() > sample.getRoisMax()) {
                 return false;
             }
-        } else if (rois != null || rois.isEmpty()) {
-            return false;
         }
         Double value;
         if (sfs != null) {
             for (SampleFeature sf : sfs) {
-                CellInfo ci = getCellInfo(typed);
-                value = ci.getValue(sf.getFeature().getIdfeature());
+                value = ps.getValue(sf.getFeature().getIdfeature());
                 if (value < sf.getMin() || value > sf.getMax()) {
                     return false;
                 }
@@ -198,38 +163,25 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return new Point(x / points.size(), y / points.size());
     }
 
-    public CellInfo getCellInfo() {
-        if (info == null) {
-            info = new CellInfo(this, false);
-        }
-        return info;
-    }
-
-    public CellInfo getCellInfo(boolean typed) {
-        if (info == null) {
-            info = new CellInfo(this, typed);
-        }
-        return info;
-    }
-
     @Override
     public String toString() {
-        CellInfo ci = getCellInfo(false);
-        String str = String.format("%30s: %8s\n", "x", ci.getX0());
-        str += String.format("%30s: %8s\n", "y", ci.getY0());
-        str += String.format("%30s: %8s\n", "label", label);
+        String str = "";
         if (sample.getSampleFeatureList() != null) {
             for (SampleFeature sf : sample.getSampleFeatureList()) {
-                str += String.format("%30s: %8.2f\n", sf.getFeature(), ci.getValue(sf.getFeature().getIdfeature()));
+                str += String.format("%30s: %8.2f\n", sf.getFeature(), getParticleStatistic().getValue(sf.getFeature().getIdfeature()));
             }
         }
         return str;
     }
 
+    public ParticleStatistic getParticleStatistic() {
+        return ps;
+    }
+
     @Override
     public int compareTo(SegmentedParticle il) {
-        Point p2 = il.getCellInfo().getCenter();
-        Point p1 = getCellInfo().getCenter();
+        Point p2 = il.getParticleStatistic().getCenter();
+        Point p1 = getParticleStatistic().getCenter();
         if (p2.y > p1.y) {
             return -1;
         }
@@ -246,8 +198,8 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
     }
 
     public ImagePlus getImagePlus() {
-        int radius = Math.max(45, (int) getCellInfo().getDiameter());
-        Point p = getCellInfo().getCenter();
+        int radius = Math.max(45, (int) getParticleStatistic().getDiameter());
+        Point p = getParticleStatistic().getCenter();
         int x0 = Math.max(p.x - radius, 0);
         int y0 = Math.max(p.y - radius, 0);
         Rectangle r = new Rectangle(x0, y0, radius * 2, radius * 2);
@@ -255,11 +207,11 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         ImageProcessor processor = grayip.crop().convertToRGB();
         int[] color = new int[]{255, 255, 0};
         int[] corecolor = new int[]{0, 255, 0};
-        for (ParticlePoint point : getCellInfo().getPpoints()) {
+        for (ParticlePoint point : getParticleStatistic().getPpoints()) {
             processor.putPixel(point.x - x0, point.y - y0, color);
         }
-        if (sample.getRoisThreshold() > 0) {
-            for (ParticlePoint point : getCellInfo().getIPPoints()) {
+        if (sample.getRoisMax() > 0) {
+            for (ParticlePoint point : getParticleStatistic().getIPPoints()) {
                 processor.putPixel(point.x - x0, point.y - y0, corecolor);
             }
         }
@@ -283,8 +235,8 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return icon;
     }
 
-    public static ParticleStatistic getStatistic(SegmentedParticle il) {
-        return new ParticleStatistic(il);
+    public void setParticleStatistic(ParticleStatistic ps) {
+        this.ps = ps;
     }
 
     public ImageProcessor getGrayIP() {

@@ -179,7 +179,7 @@ public class TypesPane extends JPanel
 		int[] count = new int[types.size()];
 		for (SegmentedParticle il : particles)
 			for (int i = 0; i < types.size(); i++)
-				if (il.getCellInfo().getIdtype() != null && il.getCellInfo().getIdtype().getIdtype() == types.get(i).getIdtype())
+				if (il.getParticleStatistic().getType() != null && il.getParticleStatistic().getType().getIdtype() == types.get(i).getIdtype())
 					count[i]++;
 		for (int i = 0; i < types.size(); i++)
 			typerows.get(i).setCount(count[i]);

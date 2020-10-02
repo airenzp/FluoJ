@@ -56,7 +56,7 @@ public class FluoJImageCanvas extends ImageCanvas {
 		int y = super.offScreenY(e.getY());
 		SegmentedParticle particle = null;
 		try {
-			particle = frame.getCImageProcess().getMotif(cip.getOriginalParticles(), new Point(x, y));
+			particle = frame.getCImageProcess().getParticle(cip.getOriginalParticles(), new Point(x, y));
 		
 		if(particle != null && e.isControlDown())
 			JOptionPane.showMessageDialog(this, particle, "Particle Data", JOptionPane.INFORMATION_MESSAGE, particle.getIcon(200));

@@ -66,7 +66,6 @@ public class AddSampleJDialog extends JDialog {
 
         filters = new ArrayList<Filter>();
         Filter eightfilter = new Filter();// always must apply this
-        eightfilter.setIdfilter((short) 1);
         eightfilter.setCommand("8-bit");
         eightfilter.setOptions("");
         filters.add(eightfilter);
@@ -222,7 +221,7 @@ public class AddSampleJDialog extends JDialog {
 
                     Short roisthreshold = (roisthresholdtf.getValue() != null) ? ((Number) roisthresholdtf.getValue()).shortValue() : null;
                     sample.setRoisThreshold(roisthreshold);
-                    sample.setRoisThreshold(((Number) roismaxtf.getValue()).shortValue());
+                    sample.setRoisMax(((Number) roismaxtf.getValue()).shortValue());
                     sample.setFillHoles((fillchb.isSelected()));
                     sample.setIdseparation((Separation) separationscb.getSelectedItem());
                     sample.setExpansionRadius(((Number) expansionradiustf.getValue()).shortValue());

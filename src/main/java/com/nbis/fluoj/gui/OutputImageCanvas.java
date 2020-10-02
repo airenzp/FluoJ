@@ -43,7 +43,7 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 		particles = cip.getFilteredParticles();
 		for (Scell ss : scells) 
 		{
-			particle = cip.getMotif(particles,	new Point(ss.getX(), ss.getY()));
+			particle = cip.getParticle(particles,	new Point(ss.getX(), ss.getY()));
 			if(particle != null)
 				particle.setScell(ss);
 			else
@@ -74,7 +74,7 @@ public class OutputImageCanvas extends FluoJImageCanvas {
 		int x = super.offScreenX(e.getX());
 		int y = super.offScreenY(e.getY());
 
-		SegmentedParticle particle = cip.getMotif(particles, new Point(x, y));
+		SegmentedParticle particle = cip.getParticle(particles, new Point(x, y));
 		
 		Scell ss = particle.getScell();
 		if(ss != null && frame instanceof ReviewJFrame)
