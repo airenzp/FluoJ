@@ -54,7 +54,7 @@ public class Type implements Serializable {
     private Integer trainingMin;
     @Column(name = "color")
     private Integer color;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "type")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idtype")
     private List<Probability> probabilityList;
     @OneToMany(mappedBy = "idtype")
     private List<Cell> cellList;

@@ -51,7 +51,7 @@ public class Feature implements Serializable {
     private Boolean roi;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "feature")
     private List<CellFeature> cellFeatureList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "feature")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idfeature")
     private List<Probability> probabilityList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "feature")
     private List<SampleFeature> sampleFeatureList;

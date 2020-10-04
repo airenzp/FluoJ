@@ -189,7 +189,11 @@ public abstract class FluoJJFrame extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 try {
+                    if (ConfigurationDB.isEmpty(getSample())) {
+                        throw new IllegalArgumentException("Sample not trained");
+                    }
                     new SessionHistogramsJDialog(FluoJJFrame.this, classifier);
 
                     new ClassifierHistogramsJDialog(FluoJJFrame.this);

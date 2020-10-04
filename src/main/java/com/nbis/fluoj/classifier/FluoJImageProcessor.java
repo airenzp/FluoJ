@@ -166,6 +166,12 @@ public class FluoJImageProcessor {
                 roisip = grayimp.getProcessor().duplicate();
                 roisip.threshold(sample.getRoisThreshold());// threshold
                 // applied
+                if (sample.getIdseparation().getIdseparation() == 1)// watershed
+                {
+                    roisip.invertLut();
+                    run(new ImagePlus("", roisip), "Watershed", "");
+                    roisip.invertLut();
+                }
                 roisip = roisip.convertToShort(false);
                 labeller.setup("", new ImagePlus("", roisip));
                 labeller.run(roisip);
@@ -281,7 +287,6 @@ public class FluoJImageProcessor {
             if(il.getParticleStatistic() == null)
                 il.setParticleStatistic(new ParticleStatistic(il));
             if (il.onBorder() || !il.isValid(sfs)) {
-                System.out.printf("removed particle %s\n", il);
                 continue;
             }
            

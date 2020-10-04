@@ -82,7 +82,7 @@ public class Sample implements Serializable {
     private Type idtype;
     @OneToMany(mappedBy = "idsample")
     private List<Filter> filterList;
-    @OneToMany(mappedBy = "idsample")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idsample")
     private List<SampleImage> sampleImageList;
 
     public Sample() {

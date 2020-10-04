@@ -6,9 +6,12 @@
 package com.nbis.fluoj.persistence;
 
 import java.io.Serializable;
+import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -25,16 +28,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Probability.findAll", query = "SELECT p FROM Probability p"),
-    @NamedQuery(name = "Probability.findByIdtype", query = "SELECT p FROM Probability p WHERE p.probabilityPK.idtype = :idtype"),
-    @NamedQuery(name = "Probability.findByIdfeature", query = "SELECT p FROM Probability p WHERE p.probabilityPK.idfeature = :idfeature"),
     @NamedQuery(name = "Probability.findByX", query = "SELECT p FROM Probability p WHERE p.x = :x"),
     @NamedQuery(name = "Probability.findByFrequence", query = "SELECT p FROM Probability p WHERE p.frequence = :frequence"),
-    @NamedQuery(name = "Probability.findByProbability", query = "SELECT p FROM Probability p WHERE p.probability = :probability")})
+    @NamedQuery(name = "Probability.findByProbability", query = "SELECT p FROM Probability p WHERE p.probability = :probability"),
+    @NamedQuery(name = "Probability.findByIdprobability", query = "SELECT p FROM Probability p WHERE p.idprobability = :idprobability")})
 public class Probability implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected ProbabilityPK probabilityPK;
     @Column(name = "x")
     private Integer x;
     @Column(name = "frequence")
@@ -42,30 +42,23 @@ public class Probability implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "probability", precision = 17, scale = 17)
     private Double probability;
-    @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false, insertable = false, updatable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "idprobability", nullable = false)
+    private Integer idprobability;
+    @JoinColumn(name = "idfeature", referencedColumnName = "idfeature", nullable = false)
     @ManyToOne(optional = false)
-    private Feature feature;
-    @JoinColumn(name = "idtype", referencedColumnName = "idtype", nullable = false, insertable = false, updatable = false)
+    private Feature idfeature;
+    @JoinColumn(name = "idtype", referencedColumnName = "idtype", nullable = false)
     @ManyToOne(optional = false)
-    private Type type;
+    private Type idtype;
 
     public Probability() {
     }
 
-    public Probability(ProbabilityPK probabilityPK) {
-        this.probabilityPK = probabilityPK;
-    }
-
-    public Probability(short idtype, short idfeature) {
-        this.probabilityPK = new ProbabilityPK(idtype, idfeature);
-    }
-
-    public ProbabilityPK getProbabilityPK() {
-        return probabilityPK;
-    }
-
-    public void setProbabilityPK(ProbabilityPK probabilityPK) {
-        this.probabilityPK = probabilityPK;
+    public Probability(Integer idprobability) {
+        this.idprobability = idprobability;
     }
 
     public Integer getX() {
@@ -92,26 +85,34 @@ public class Probability implements Serializable {
         this.probability = probability;
     }
 
-    public Feature getFeature() {
-        return feature;
+    public Integer getIdprobability() {
+        return idprobability;
     }
 
-    public void setFeature(Feature feature) {
-        this.feature = feature;
+    public void setIdprobability(Integer idprobability) {
+        this.idprobability = idprobability;
     }
 
-    public Type getType() {
-        return type;
+    public Feature getIdfeature() {
+        return idfeature;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setIdfeature(Feature idfeature) {
+        this.idfeature = idfeature;
+    }
+
+    public Type getIdtype() {
+        return idtype;
+    }
+
+    public void setIdtype(Type idtype) {
+        this.idtype = idtype;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (probabilityPK != null ? probabilityPK.hashCode() : 0);
+        hash += (idprobability != null ? idprobability.hashCode() : 0);
         return hash;
     }
 
@@ -122,7 +123,7 @@ public class Probability implements Serializable {
             return false;
         }
         Probability other = (Probability) object;
-        if ((this.probabilityPK == null && other.probabilityPK != null) || (this.probabilityPK != null && !this.probabilityPK.equals(other.probabilityPK))) {
+        if ((this.idprobability == null && other.idprobability != null) || (this.idprobability != null && !this.idprobability.equals(other.idprobability))) {
             return false;
         }
         return true;
@@ -130,7 +131,7 @@ public class Probability implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Probability[ probabilityPK=" + probabilityPK + " ]";
+        return "com.nbis.fluoj.persistence.Probability[ idprobability=" + idprobability + " ]";
     }
     
 }

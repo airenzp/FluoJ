@@ -94,17 +94,15 @@ public class CellProcessor {
 				em.getTransaction().begin();
 				try {
 					for (int k = 0; k < ftps.size(); k++) {
-						if (k % 20 == 0) {
-							em.flush();
-							em.clear();
-						}
+						
 						em.merge(ftps.get(k));
 					}
 					em.getTransaction().commit();
 				}
 				catch (Exception e) {
-					em.getTransaction().rollback();
+                                    
 					e.printStackTrace();
+					em.getTransaction().rollback();
 				}
 			}
 		}

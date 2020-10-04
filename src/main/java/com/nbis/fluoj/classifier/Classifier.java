@@ -163,7 +163,7 @@ public class Classifier implements IClassifier {
             getLogger().log(Level.SEVERE, e.getMessage(), e);
             throw e;
         }
-        SampleImage ir = cdb.saveImageResource(img, em);
+        SampleImage ir = cdb.saveImageResource(img, sample, em);
         for (int i = 0; i < scells.size(); i++) {
             scells.get(i).setIdimage(ir);
         }

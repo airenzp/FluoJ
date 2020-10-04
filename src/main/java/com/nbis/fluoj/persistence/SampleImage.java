@@ -54,8 +54,8 @@ public class SampleImage implements Serializable {
     private List<Cell> cellList;
     @OneToMany(mappedBy = "idimage")
     private List<Sample> sampleList;
-    @JoinColumn(name = "idsample", referencedColumnName = "idsample")
-    @ManyToOne
+    @JoinColumn(name = "idsample", referencedColumnName = "idsample", nullable = false)
+    @ManyToOne(optional = false)
     private Sample idsample;
     @OneToMany(mappedBy = "idimage")
     private List<Scell> scellList;
@@ -148,7 +148,7 @@ public class SampleImage implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.SampleImage[ idimage=" + idimage + " ]";
+        return name;
     }
     
 }

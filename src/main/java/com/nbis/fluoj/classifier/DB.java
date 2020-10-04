@@ -82,7 +82,7 @@ public abstract class DB {
 
 	// Image////////////////////////////////////////////////
 
-	public SampleImage saveImageResource(ImagePlus img, EntityManager em) {
+	public SampleImage saveImageResource(ImagePlus img, Sample sample, EntityManager em) {
 		if (img == null) throw new IllegalArgumentException(Constants.getEmptyFieldMsg("image"));
 		String dir;
 		SampleImage ir = null;
@@ -90,6 +90,7 @@ public abstract class DB {
 		try {
 			em.getTransaction().begin();
 			ir = new SampleImage();
+                        ir.setIdsample(sample);
 			em.persist(ir);
 			em.flush();
 			ir.setName(ir.getIdimage() + ".tif");
@@ -124,17 +125,17 @@ public abstract class DB {
 		em.getTransaction().begin();
 
 		try {
-			em.createQuery("delete from Session s where (s.date <= :date or s.date is null) and (s.sample.session is null or not (s.sample.session.idsession = s.idsession))")
+			em.createQuery("delete from Session s where (s.date <= :date or s.date is null) and (s.idsample.idsession is null or not (s.idsample.idsession = s))")
 					.setParameter("date", date).executeUpdate();
 			//takes active sessions images for any sample on Scells
-			String noactiveimages =  " and ir.idimage not in (select ss.sample_image.idimage from Scell ss where ss.session.idsession in "
-					+ "(Select sa.session.idsession from Sample sa where sa.session.idsession is not null) ) ";
+			String noactiveimages =  " and ir.idimage not in (select ss.idimage.idimage from Scell ss where ss.idsession in "
+					+ "(Select sa.idsession from Sample sa where sa.idsession is not null) ) ";
 
 			//excludes sample image and cells images
-			String norefimages =  " and ir.idimage not in (select c.sample_image.idimage from Cell c) " +
-									 "and ir.idimage not in (select s.sample_image.idimage from Sample s)";
+			String norefimages =  " and ir.idimage not in (select c.idimage.idimage from Cell c) " +
+									 "and ir.idimage not in (select s.idimage.idimage from Sample s)";
 
-			List<SampleImage> irs = em.createQuery("select ir from Image ir where ir.date <= :date" + noactiveimages
+			List<SampleImage> irs = em.createQuery("select ir from SampleImage ir where ir.date <= :date" + noactiveimages
 							+  norefimages).setParameter("date", date).getResultList();
 			SampleImage ir;
 			String file;

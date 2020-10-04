@@ -50,13 +50,14 @@ public class FluoJImageCanvas extends ImageCanvas {
 	}
 
 	public void mousePressed(MouseEvent e) {
-		if (!IJ.getToolName().equals("FluoJ"))
+		if (IJ.getInstance() != null && !IJ.getToolName().equals("FluoJ"))
 			super.mousePressed(e);
 		int x = super.offScreenX(e.getX());
 		int y = super.offScreenY(e.getY());
 		SegmentedParticle particle = null;
 		try {
 			particle = frame.getCImageProcess().getParticle(cip.getOriginalParticles(), new Point(x, y));
+                        System.out.println(particle);
 		
 		if(particle != null && e.isControlDown())
 			JOptionPane.showMessageDialog(this, particle, "Particle Data", JOptionPane.INFORMATION_MESSAGE, particle.getIcon(200));
@@ -68,7 +69,7 @@ public class FluoJImageCanvas extends ImageCanvas {
 
 	public void mouseEntered(MouseEvent e) {
 		super.mouseEntered(e);
-		if (!IJ.getToolName().equals("FluoJ"))
+		if (IJ.getInstance() != null && !IJ.getToolName().equals("FluoJ"))
 			setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 	}
 

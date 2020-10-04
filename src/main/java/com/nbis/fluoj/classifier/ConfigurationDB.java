@@ -50,7 +50,7 @@ public class ConfigurationDB extends DB {
     private static String unrelatedFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = FALSE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String unrelatedCoreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String coreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and sf.sample = :sample";
-    private boolean debug = true;
+    private boolean debug = false;//Shows all the steps in the image processing
     
     public static void main(String[] args) {
         EntityManager em = ConfigurationDB.getEM();
@@ -244,14 +244,15 @@ public class ConfigurationDB extends DB {
             // versions using remove where not working and this one does
             int idsample = s.getIdsample().intValue();
             em.getTransaction().begin();
-            em.createNativeQuery("update SAMPLE set PSESSION = NULL where SAMPLE.IDSAMPLE = ?").setParameter(1, idsample).executeUpdate();
+            em.createNativeQuery("update sample set idsession = NULL where idsample = ?").setParameter(1, idsample).executeUpdate();
 
             em.createNativeQuery("delete from SESSION where SESSION.IDSAMPLE = ?").setParameter(1, idsample).executeUpdate();
-            new File(getPath(s.getIdimage())).delete();
             em.createNativeQuery("delete from SAMPLE where SAMPLE.IDSAMPLE = ?").setParameter(1, idsample).executeUpdate();
             em.getTransaction().commit();
+            new File(getPath(s.getIdimage())).delete();
 
         } catch (Exception e) {
+            e.printStackTrace();
             em.getTransaction().rollback();
             throw new CDBException(e.getMessage());
         }
@@ -275,7 +276,7 @@ public class ConfigurationDB extends DB {
 
     public static Double getMinForFeatureOnSample(int idsample, int idfeature, EntityManager em) {
         Object result = em
-                .createQuery("select min(cf.value) from CellFeature cf where cf.cell.sample.idsample = :idsample and cf.feature.idfeature = :idfeature")
+                .createQuery("select min(cf.value) from CellFeature cf where cf.cell.idimage.idsample.idsample = :idsample and cf.feature.idfeature = :idfeature")
                 .setParameter("idfeature", idfeature).setParameter("idsample", idsample).getSingleResult();
         if (result != null) {
             return (Double) result;
@@ -285,7 +286,7 @@ public class ConfigurationDB extends DB {
 
     public static Double getMaxForFeatureOnSample(int idsample, int idfeature, EntityManager em) {
         Object result = em
-                .createQuery("select max(cf.value) from CellFeature cf where cf.cell.sample.idsample = :idsample and cf.feature.idfeature = :idfeature")
+                .createQuery("select max(cf.value) from CellFeature cf where cf.cell.idimage.idsample.idsample = :idsample and cf.feature.idfeature = :idfeature")
                 .setParameter("idfeature", idfeature).setParameter("idsample", idsample).getSingleResult();
         if (result != null) {
             return (Double) result;
@@ -312,7 +313,7 @@ public class ConfigurationDB extends DB {
             }
             int idsample = sfs.get(0).getIdsample().getIdsample();
             em.getTransaction().begin();
-            em.createQuery("delete from Filter sf where sf.sample.idsample = :idsample").setParameter("idsample", idsample);
+            em.createQuery("delete from Filter sf where sf.idsample.idsample = :idsample").setParameter("idsample", idsample);
             for (Filter sf : sfs) {
                 em.persist(sf);
             }
@@ -566,7 +567,7 @@ public class ConfigurationDB extends DB {
 
     public static Double getMinForFeatureOnSampleSession(Integer idsession, Short idfeature, EntityManager em) {
         Object result = em
-                .createQuery("select min(scf.value) from ScellFeature scf where scf.scell.session.idsession = :idsession and scf.feature.idfeature = :idfeature")
+                .createQuery("select min(scf.value) from ScellFeature scf where scf.scell.idsession.idsession = :idsession and scf.feature.idfeature = :idfeature")
                 .setParameter("idfeature", idfeature).setParameter("idsession", idsession).getSingleResult();
         if (result != null) {
             return (Double) result;
@@ -576,7 +577,7 @@ public class ConfigurationDB extends DB {
 
     public static Double getMaxForFeatureOnSampleSession(Integer idsession, Short idfeature, EntityManager em) {
         Object result = em
-                .createQuery("select max(scf.value) from ScellFeature scf where scf.scell.session.idsession = :idsession and scf.feature.idfeature = :idfeature")
+                .createQuery("select max(scf.value) from ScellFeature scf where scf.scell.idsession.idsession = :idsession and scf.feature.idfeature = :idfeature")
                 .setParameter("idfeature", idfeature).setParameter("idsession", idsession).getSingleResult();
         if (result != null) {
             return (Double) result;

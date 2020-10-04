@@ -341,6 +341,7 @@ public class EditSampleFeaturesJDialog extends JDialog {
         int index = sfeatures.size();
         sfeatures.add(sf);
         sfeaturesmd.fireTableRowsInserted(index, index);
+        frame.resetCImageProcess();
 
     }
 

@@ -2,14 +2,14 @@ package com.nbis.fluoj.classifier;
 
 import java.util.List;
 
-public class CellStatistics {
+public class FeatureStatistics {
 	
 	public int idtype;
 	public int idfeature;
 	public double avg;
 	public double deviation;
 	
-	public CellStatistics(int idtype, int idfeature, double avg, double deviation)
+	public FeatureStatistics(int idtype, int idfeature, double avg, double deviation)
 	{
 		this.idtype = idtype;
 		this.idfeature = idfeature;
@@ -17,9 +17,9 @@ public class CellStatistics {
 		this.deviation = deviation;
 	}
 	
-	public static CellStatistics getStatistics(int idtype, int idfeature, List<CellStatistics> list)
+	public static FeatureStatistics getStatistics(int idtype, int idfeature, List<FeatureStatistics> list)
 	{
-		CellStatistics cellstat;
+		FeatureStatistics cellstat;
 		for(int i = 0; i < list.size(); i ++)
 		{
 			cellstat = list.get(i);

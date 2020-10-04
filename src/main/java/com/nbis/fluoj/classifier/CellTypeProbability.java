@@ -9,16 +9,16 @@ package com.nbis.fluoj.classifier;
  */
 public class CellTypeProbability {
 	
-	public int idtype = -1;
+	public short idtype = -1;
 	public double probability = -1;
 	
-	public CellTypeProbability(int idtype, double probability)
+	public CellTypeProbability(short idtype, double probability)
 	{
 		this.idtype = idtype;
 		this.probability = probability;
 	}
 	
-	public CellTypeProbability(int idtype)
+	public CellTypeProbability(short idtype)
 	{
 		this.idtype = idtype;
 	}

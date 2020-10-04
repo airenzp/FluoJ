@@ -72,7 +72,7 @@ public class ProcessorDB extends DB {
 		try {
 			Object result = em
 					.createQuery(
-							"select COUNT(s) from Cell s where s.type.idtype = :idtype")
+							"select COUNT(s) from Cell s where s.idtype.idtype = :idtype")
 					.setParameter("idstype", idtype).getSingleResult();
 			return ((Long) result).intValue();
 		} catch (Exception e) {
@@ -84,14 +84,14 @@ public class ProcessorDB extends DB {
 	public void importTrainingData(Session session, EntityManager em) {
 		em.getTransaction().begin();
 		try {
-			em.createQuery("delete from Cell c where c.sample_image.sample.idsample = :idsample").setParameter("idsample", session.getIdsample().getIdsample()).executeUpdate();
+			em.createQuery("delete from Cell c where c.idimage.idsample.idsample = :idsample").setParameter("idsample", session.getIdsample().getIdsample()).executeUpdate();
 			if (session == null) {
 				em.getTransaction().commit();
 				return;
 			}
 			List<Scell> list = (List<Scell>) em
 					.createQuery(
-							"select ss from Scell ss where ss.session.idsession = :idsession")
+							"select ss from Scell ss where ss.idsession.idsession = :idsession")
 					.setParameter("idsession", session.getIdsession())
 					.getResultList();
 			Scell sc;
@@ -151,7 +151,7 @@ public class ProcessorDB extends DB {
 		try {
 			return em
 					.createQuery(
-							"select ftp from Probability ftp where ftp.type.idtype = :idtype and ftp.feature.idfeature = :idfeature order by ftp.x")
+							"select ftp from Probability ftp where ftp.idtype.idtype = :idtype and ftp.idfeature.idfeature = :idfeature order by ftp.x")
 					.setParameter("idtype", idtype)
 					.setParameter("idfeature", idfeature).getResultList();
 
@@ -170,11 +170,11 @@ public class ProcessorDB extends DB {
 				return ftps;
 			Double max = ConfigurationDB.getMaxForFeatureOnSample(
 					sample.getIdsample(), feature.getIdfeature(), em);
-			String query = "select floor((cf.value - ?)/?) as x, count(*) as freq "
-					+ "from cellfeature cf inner join SampleFeature sf on cf.idfeature = sf.idfeature inner join cell c on c.idcell = cf.idcell "
-					+ "where cf.idfeature = ? and c.class = ? "
-					+ "group by x "
-					+ "order by x";
+			String query = "select (floor((cf.value - ?)/?)) as xpos, count(*) as freq "
+					+ "from cell_feature cf inner join cell c on c.idcell = cf.idcell "
+					+ "where cf.idfeature = ? and c.idtype = ? "
+					+ "group by xpos "
+					+ "order by xpos";
 			double scale = (max - min) / CellProcessor.marks;
 			int idfeature = feature.getIdfeature();
 			int idtype = type.getIdtype();
@@ -193,8 +193,8 @@ public class ProcessorDB extends DB {
 				x = ((Double) item[0]).intValue();
 				freq = ((Long) item[1]).intValue();
 				ftp = new Probability();
-				ftp.setFeature(feature);
-				ftp.setType(type);
+				ftp.setIdfeature(feature);
+				ftp.setIdtype(type);
 				ftp.setX(x);
 				ftp.setFrequence(freq);
 				ftp.setProbability(freq.doubleValue());
@@ -212,8 +212,8 @@ public class ProcessorDB extends DB {
 			em.getTransaction().begin();
 			List<Probability> ftps = em
 					.createQuery(
-							"select ftp from Probability ftp where ftp.type.sample.idsample = :idsample")
-					.setParameter("idsample", sample.getIdsample())
+							"select ftp from Probability ftp where ftp.idtype.idsample = :idsample")
+					.setParameter("idsample", sample)
 					.getResultList();
 			for (Probability ftp : ftps)
 				em.remove(ftp);
@@ -231,7 +231,7 @@ public class ProcessorDB extends DB {
 		try
 		{
 			List<Object[]> results = em.createQuery( "select ftp.x, ftp.probability from Probability ftp " +
-											"where ftp.type.idtype = :idtype and ftp.feature.idfeature = :idfeature " +
+											"where ftp.idtype.idtype = :idtype and ftp.idfeature.idfeature = :idfeature " +
 											"order by ftp.x").
 											setParameter("idtype", idtype).
 											setParameter("idfeature", idfeature).getResultList();

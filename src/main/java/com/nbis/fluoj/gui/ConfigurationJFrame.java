@@ -311,13 +311,11 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
     public void addSample(Sample s, ImagePlus image) {
         samples.add(s);
         SampleImage ir = null;
+        cconfigurationdb.persist(s, em);
         if (image != null) {
-            ir = cconfigurationdb.saveImageResource(image, em);
+            ir = cconfigurationdb.saveImageResource(image, s, em);
         }
         s.setIdimage(ir);
-
-        cconfigurationdb.persist(s, em);
-
         samplesmd.fireTableRowsInserted(samples.size(), samples.size());
 
     }
@@ -425,9 +423,9 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            if (columnIndex == 0) {
-                return false;
-            }
+//            if (columnIndex == 0) {
+//                return false;
+//            }
 
             return true;
         }
@@ -597,7 +595,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
             if (column == 1) {
                 return new SessionTableCellEditor();
             }
-            if (column == 9) {
+            if (column == 8) {
                 return new TypeTableCellEditor();
             }
             if (column == 5) {
