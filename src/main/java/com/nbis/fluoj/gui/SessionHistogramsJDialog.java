@@ -42,7 +42,7 @@ public class SessionHistogramsJDialog extends JDialog
 			classifier = new Classifier(parent.getSample().getIdsession());
 		ChartPanel chartpn;
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setTitle("Sample Histograms");
+		setTitle("Sample Session Histograms");
 		GridBagConstraints constraints = new GridBagConstraints();
 		JScrollPane sp = new JScrollPane();
 		sp.setPreferredSize(new Dimension(800, 590));

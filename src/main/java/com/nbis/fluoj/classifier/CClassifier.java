@@ -138,7 +138,7 @@ public class CClassifier {
                     winner = getWinner(probs);
                     ss = (Scell) em.find(Scell.class, current);
                     st = (winner != null) ? (Type) em.find(Type.class, winner) : null;
-                    ss.setIdtype(st);
+                    ss.setWinner(st);
                     em.merge(ss);
                     // scdb.getUpdateWinnerQuery(current, winner,
                     // em).executeUpdate();

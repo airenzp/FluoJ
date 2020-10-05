@@ -5,14 +5,9 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.MenuShortcut;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -39,9 +34,7 @@ import com.nbis.fluoj.persistence.SampleFeature;
 import com.nbis.fluoj.persistence.Scell;
 import com.nbis.fluoj.persistence.ScellFeature;
 import com.nbis.fluoj.classifier.ConfigurationDB;
-import com.nbis.fluoj.persistence.Probability;
 import com.nbis.fluoj.classifier.Classifier;
-import com.nbis.fluoj.persistence.Type;
 
 /**
  * Displays {@link persistence.Scell} info including
@@ -89,7 +82,7 @@ public class CTableJFrame extends JFrame {
 
     private void initComponents() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setTitle("Cells Info");
+        setTitle("Classifier Data");
 
         JPanel containerpn = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -180,7 +173,7 @@ public class CTableJFrame extends JFrame {
             column_names.add("Session");
             column_names.add("Date");
             column_names.add("Image");
-            column_names.add("Class");
+            column_names.add("Type");
             column_names.add("Winner");
             column_names.add("X");
             column_names.add("Y");

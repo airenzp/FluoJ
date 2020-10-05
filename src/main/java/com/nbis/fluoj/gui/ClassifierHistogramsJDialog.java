@@ -53,7 +53,6 @@ public class ClassifierHistogramsJDialog extends JDialog {
             if (sf.getActive()) {
                 max = ConfigurationDB.getMaxForFeatureOnSample(sf.getSample().getIdsample(), sf.getFeature().getIdfeature(), parent.em);
                 min = ConfigurationDB.getMinForFeatureOnSample(sf.getSample().getIdsample(), sf.getFeature().getIdfeature(), parent.em);
-                System.out.printf("%s %.2f %.2f \n", sf.getFeature().getName(), min, max);
                 double step = (max - min) / (CellProcessor.marks + 1);
                 for (com.nbis.fluoj.persistence.Type t : parent.getSample().getTypeList()) {
                     if (!t.getProbabilityList().isEmpty()) {

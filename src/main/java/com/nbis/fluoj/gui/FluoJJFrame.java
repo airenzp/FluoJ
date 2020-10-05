@@ -112,7 +112,7 @@ public abstract class FluoJJFrame extends JFrame {
         filemn.add(exporthistmi);
 
         configurationmi = new JMenuItem("Configuration");
-        windowmn.add("Configuration");
+        windowmn.add(configurationmi);
 
         trainingmi = new JMenuItem("Training");
         windowmn.add(trainingmi);
@@ -257,7 +257,7 @@ public abstract class FluoJJFrame extends JFrame {
                     if (ConfigurationDB.isEmpty(getSample())) {
                         throw new IllegalArgumentException("Sample not trained");
                     }
-                    new SessionHistogramsJDialog(FluoJJFrame.this, classifier);
+                    //new SessionHistogramsJDialog(FluoJJFrame.this, classifier);
 
                     new ClassifierHistogramsJDialog(FluoJJFrame.this);
                 } catch (Exception e1) {
