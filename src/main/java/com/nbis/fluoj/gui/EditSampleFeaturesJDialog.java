@@ -94,12 +94,12 @@ public class EditSampleFeaturesJDialog extends JDialog {
 
         sfeaturestb.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         sfeaturestb.getColumnModel().getColumn(0).setPreferredWidth(150);// Name
-        sfeaturestb.getColumnModel().getColumn(1).setPreferredWidth(340);// Description
+        sfeaturestb.getColumnModel().getColumn(1).setPreferredWidth(240);// Description
         sfeaturestb.getColumnModel().getColumn(2).setPreferredWidth(80);// Min
         sfeaturestb.getColumnModel().getColumn(3).setPreferredWidth(80);// Max
         sfeaturestb.getColumnModel().getColumn(4).setPreferredWidth(150);//
         sp.setViewportView(sfeaturestb);
-        sfeaturestb.setPreferredScrollableViewportSize(new Dimension(800, 300));
+        sfeaturestb.setPreferredScrollableViewportSize(new Dimension(800, 200));
 
         JPanel buttonspn = new JPanel();
         if (frame instanceof ConfigurationJFrame) {

@@ -50,7 +50,7 @@ public class ConfigurationDB extends DB {
     private static String unrelatedFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = FALSE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String unrelatedCoreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String coreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and sf.sample = :sample";
-    private boolean debug = false;//Shows all the steps in the image processing
+    private static boolean debug = false;//Shows all the steps in the image processing
     
     public static void main(String[] args) {
         EntityManager em = ConfigurationDB.getEM();
@@ -504,12 +504,12 @@ public class ConfigurationDB extends DB {
         return type;
     }
 
-    public void setDebug(boolean debug) {
-        this.debug = debug;
+    public static void setDebug(boolean debug) {
+        ConfigurationDB.debug = debug;
 
     }
 
-    public boolean isDebug() {
+    public static boolean isDebug() {
         return debug;
 
     }
@@ -605,7 +605,7 @@ public class ConfigurationDB extends DB {
         } else {
             file = getPath(image);
         }
-        Image icon_image = new ImagePlus(file).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        Image icon_image = new ImagePlus(file).getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         icon = new ImageIcon(icon_image);
 
         return icon;

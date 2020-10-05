@@ -16,7 +16,7 @@ import ij.plugin.PlugIn;
  * @author Airen
  * 
  */
-public class Automatic_Image_Processing implements PlugIn {
+public class Automatic_Processing implements PlugIn {
 
 	public void run(String args) {
 		SwingUtilities.invokeLater(new Runnable() {

@@ -44,6 +44,9 @@ import com.nbis.fluoj.classifier.Classifier;
 import com.nbis.fluoj.classifier.ConfigurationDB;
 import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
+import ij.process.ImageProcessor;
+import javax.swing.JCheckBox;
+import javax.swing.JToggleButton;
 
 public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
@@ -63,6 +66,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
     public static Session nonesession = ConfigurationDB.anysession;
     public static com.nbis.fluoj.persistence.Type nonetype = ConfigurationDB.nonetype;
     protected JCheckBoxMenuItem debugsegmentationmi;
+    private JToggleButton debugbt;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -77,6 +81,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
             }
         });
     }
+    
 
     public List<Sample> getSamples() {
         return samples;
@@ -95,20 +100,10 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
     }
 
     private void initComponents() {
-        setResizable(false);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        //setResizable(false);
+        //setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("FluoJ Configuration");
 
-        debugsegmentationmi = new JCheckBoxMenuItem("Debug Segmentation");
-        debugsegmentationmi.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cconfigurationdb.setDebug(debugsegmentationmi.isSelected());
-                resetCImageProcess();
-            }
-        });
-        filemn.add(debugsegmentationmi);
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
@@ -119,8 +114,8 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         samplespn.add(sp, FluoJUtils.getConstraints(constraints, 0, 0, 2));
 
         JPanel imgpn = new JPanel();
-        imgpn.setBorder(BorderFactory
-                .createTitledBorder(null, "Image", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BELOW_BOTTOM));
+        //imgpn.setBorder(BorderFactory
+        //        .createTitledBorder(null, "Image", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BELOW_BOTTOM));
         iconlb = new JLabel(ConfigurationDB.getDefaultIcon());
         imgpn.add(iconlb);
         samplespn.add(imgpn, FluoJUtils.getConstraints(constraints, 2, 0, 1));
@@ -129,7 +124,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         samplestb = new MyJTable();
         samplestb.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         samplestb.setOpaque(true);
-        samplestb.setPreferredScrollableViewportSize(new Dimension(640, 200));
+        samplestb.setPreferredScrollableViewportSize(new Dimension(820, 150));
         samplesmd = new SampleTableModel();
         samplestb.setModel(samplesmd);
         samplestb.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -163,6 +158,9 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         buttonspn.add(processimgbt);
         activeimgbt = new JButton("Try Active");
         buttonspn.add(activeimgbt);
+        
+        debugbt = new JToggleButton("Debug");
+        buttonspn.add(debugbt);
 
         setEnabledSampleActions(false);
         add(buttonspn, FluoJUtils.getConstraints(constraints, 0, 1, 1));
@@ -184,10 +182,19 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         filtersbt.setEnabled(enable);
         exporthistmi.setEnabled(enable);
         histogramsmi.setEnabled(enable);
-        debugsegmentationmi.setEnabled(enable);
     }
 
     private void addListeners() {
+        
+        debugbt.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ConfigurationDB.setDebug(debugbt.isSelected());
+                if(ConfigurationDB.isDebug())
+                    resetCImageProcess();
+            }
+        });
+        
         samplestb.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
@@ -258,7 +265,10 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    if(ConfigurationDB.isDebug())
+                        resetCImageProcess();
                     processImageParticles();
+                    loadImageData(getCImageProcess());
                 } catch (InvalidOperationOnResourceException e1) {
                     JOptionPane.showMessageDialog(ConfigurationJFrame.this, e1);
                 }
@@ -276,7 +286,9 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                     return;
                 }
                 try {
-                    processImageParticles(new FluoJImageProcessor(img, sample, false, cconfigurationdb.isDebug()), sample.getSampleFeatureList());
+                    FluoJImageProcessor cip = new FluoJImageProcessor(img, sample, false, cconfigurationdb.isDebug());
+                    processImageParticles(cip, sample.getSampleFeatureList());
+                    loadImageData(cip);
                 } catch (InvalidOperationOnResourceException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();

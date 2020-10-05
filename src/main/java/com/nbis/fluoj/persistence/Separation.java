@@ -98,7 +98,7 @@ public class Separation implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Separation[ idseparation=" + idseparation + " ]";
+        return name;
     }
     
 }

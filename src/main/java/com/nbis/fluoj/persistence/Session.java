@@ -137,7 +137,7 @@ public class Session implements Serializable {
 
     @Override
     public String toString() {
-        return "com.nbis.fluoj.persistence.Session[ idsession=" + idsession + " ]";
+        return name;
     }
     
 }

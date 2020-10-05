@@ -143,6 +143,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
             for (SampleFeature sf : sfs) {
                 value = ps.getValue(sf.getFeature().getIdfeature());
                 if (value < sf.getMin() || value > sf.getMax()) {
+                    System.out.printf("Particle %s is not valid. Feature value %s out of bounds\n", this, value);
                     return false;
                 }
             }
