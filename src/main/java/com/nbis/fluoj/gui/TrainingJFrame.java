@@ -381,7 +381,7 @@ public class TrainingJFrame extends FluoJJFrame {
 
         canvas = new FluoJTrainingCanvas(this);
         canvas.displayImage();
-
+        loadImageData(getCImageProcess());
     }
 
     @Override

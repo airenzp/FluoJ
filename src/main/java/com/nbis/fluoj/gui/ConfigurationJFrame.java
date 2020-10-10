@@ -118,25 +118,25 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
         //        .createTitledBorder(null, "Image", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BELOW_BOTTOM));
         iconlb = new JLabel(ConfigurationDB.getDefaultIcon());
         imgpn.add(iconlb);
-        samplespn.add(imgpn, FluoJUtils.getConstraints(constraints, 2, 0, 1));
+        samplespn.add(imgpn, FluoJUtils.getConstraints( constraints, 2, 0, 1));
 
         index = -1;
         samplestb = new MyJTable();
         samplestb.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         samplestb.setOpaque(true);
-        samplestb.setPreferredScrollableViewportSize(new Dimension(820, 150));
+        samplestb.setPreferredScrollableViewportSize(new Dimension(600, 130));
         samplesmd = new SampleTableModel();
         samplestb.setModel(samplesmd);
-        samplestb.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        samplestb.getColumnModel().getColumn(0).setPreferredWidth(150);// Name
-        samplestb.getColumnModel().getColumn(1).setPreferredWidth(60);// Session
-        samplestb.getColumnModel().getColumn(2).setPreferredWidth(70);// Threshold
-        samplestb.getColumnModel().getColumn(3).setPreferredWidth(100);// RoisMax
-        samplestb.getColumnModel().getColumn(4).setPreferredWidth(65);//Fill Holes
-        samplestb.getColumnModel().getColumn(5).setPreferredWidth(115);// Separation
-        samplestb.getColumnModel().getColumn(6).setPreferredWidth(80);// Exp radius
-        samplestb.getColumnModel().getColumn(7).setPreferredWidth(80);// rois
-        samplestb.getColumnModel().getColumn(8).setPreferredWidth(100);//Default type
+//        samplestb.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        samplestb.getColumnModel().getColumn(0).setPreferredWidth(150);// Name
+//        samplestb.getColumnModel().getColumn(1).setPreferredWidth(60);// Session
+//        samplestb.getColumnModel().getColumn(2).setPreferredWidth(70);// Threshold
+//        samplestb.getColumnModel().getColumn(3).setPreferredWidth(100);// RoisMax
+//        samplestb.getColumnModel().getColumn(4).setPreferredWidth(65);//Fill Holes
+//        samplestb.getColumnModel().getColumn(5).setPreferredWidth(115);// Separation
+//        samplestb.getColumnModel().getColumn(6).setPreferredWidth(80);// Exp radius
+//        samplestb.getColumnModel().getColumn(7).setPreferredWidth(80);// rois
+//        samplestb.getColumnModel().getColumn(8).setPreferredWidth(100);//Default type
 
         // Threshold
         sp.setViewportView(samplestb);
@@ -420,7 +420,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     class SampleTableModel extends AbstractTableModel {
 
-        private String[] columns = new String[]{"Name", "Session", "Threshold", "Rois Threshold",
+        private String[] columns = new String[]{"Name", "Threshold", "Rois Threshold",
             "Fill Holes", "Separate", "Expansion", "ROIsMax", "Default Type",};
 
         @Override
@@ -449,10 +449,10 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                 if (column == 1) {
                     return Session.class;
                 }
-                if (column == 8) {
+                if (column == 7) {
                     return com.nbis.fluoj.persistence.Type.class;
                 }
-                if (column == 5) {
+                if (column == 4) {
                     return com.nbis.fluoj.persistence.Separation.class;
                 }
 
@@ -473,14 +473,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                 int result;
                 if (columnIndex == 0) {
                     sample.setName((String) value);
-                } else if (columnIndex == 1) {
-                    Session s = (Session) value;
-                    if (s != null && !s.equals(nonesession)) {
-                        sample.setIdsession(s);
-                    } else {
-                        sample.setIdsession(null);
-                    }
-                } else if (columnIndex == 2) {
+                }  else if (columnIndex == 1) {
                     if (value == null) {
                         throw new IllegalArgumentException(Constants.getEmptyFieldMsg("threshold"));
                     }
@@ -490,7 +483,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         sample.setImageThreshold(threshold);
                         resetCImageProcess();
                     }
-                } else if (columnIndex == 3) {
+                } else if (columnIndex == 2) {
                     if (value == null) {
                         throw new IllegalArgumentException(Constants.getEmptyFieldMsg("rois threshold"));
                     }
@@ -500,7 +493,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         sample.setRoisThreshold(threshold);
                         resetCImageProcess();
                     }
-                } else if (columnIndex == 4) {
+                } else if (columnIndex == 3) {
                     Boolean fill = (Boolean) value;
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
@@ -508,7 +501,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         resetCImageProcess();
                     }
 
-                } else if (columnIndex == 5) {
+                } else if (columnIndex == 4) {
                     Separation separation = (Separation) value;
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
@@ -516,7 +509,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         resetCImageProcess();
                     }
 
-                } else if (columnIndex == 6) {
+                } else if (columnIndex == 5) {
                     Short expansionradius = (Short) value;
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
@@ -524,7 +517,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         resetCImageProcess();
                     }
 
-                } else if (columnIndex == 7) {
+                } else if (columnIndex == 6) {
                     Short roismax = (Short) value;
                     result = resetDB();
                     if (result == JOptionPane.YES_OPTION) {
@@ -532,7 +525,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                         resetCImageProcess();
                     }
 
-                } else if (columnIndex == 8) {
+                } else if (columnIndex == 7) {
                     com.nbis.fluoj.persistence.Type type = (com.nbis.fluoj.persistence.Type) value;
                     if (type.getIdtype() != null) {
                         sample.setIdtype(type);
@@ -557,38 +550,31 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
             if (columnIndex == 0) {
                 return sample.getName();
             }
+           
+
             if (columnIndex == 1) {
-                if (sample.getIdsession() == null) {
-                    return nonesession;
-                } else {
-                    return sample.getIdsession();
-                }
-
-            }
-
-            if (columnIndex == 2) {
                 return sample.getImageThreshold();
             }
 
-            if (columnIndex == 3) {
+            if (columnIndex == 2) {
                 return sample.getRoisThreshold();
             }
 
-            if (columnIndex == 4) {
+            if (columnIndex == 3) {
                 return (sample.getFillHoles());
             }
-            if (columnIndex == 5) {
+            if (columnIndex == 4) {
                 return sample.getIdseparation();
             }
 
-            if (columnIndex == 6) {
+            if (columnIndex == 5) {
                 return sample.getExpansionRadius();
             }
-            if (columnIndex == 7) {
+            if (columnIndex == 6) {
                 return sample.getRoisMax();
             }
 
-            if (columnIndex == 8) {
+            if (columnIndex == 7) {
                 if (sample.getIdtype() == null) {
                     return ConfigurationJFrame.nonetype;
                 } else {
@@ -604,13 +590,11 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
         @Override
         public TableCellEditor getCellEditor(int row, int column) {
-            if (column == 1) {
-                return new SessionTableCellEditor();
-            }
-            if (column == 8) {
+           
+            if (column == 7) {
                 return new TypeTableCellEditor();
             }
-            if (column == 5) {
+            if (column == 4) {
                 return new SeparateTableCellEditor();
             }
             return super.getCellEditor(row, column);
@@ -666,55 +650,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     }
 
-    class SessionTableCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-        private JComboBox cb;
-
-        public SessionTableCellEditor() {
-            cb = new JComboBox();
-            cb.setOpaque(true);
-            cb.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-
-                    Session session = (Session) cb.getSelectedItem();
-                    if ((session.equals(nonesession) && sample.getIdsession() == null) || session.equals(sample.getIdsession())) {
-                        return;// nothing to do here
-                    }
-                    if (!session.equals(ConfigurationJFrame.nonesession)) {
-                        sample.setIdsession(session);
-                    } else {
-                        sample.setIdsession(null);
-                    }
-                    sample = cconfigurationdb.mergeSample(sample, em);
-                }
-            });
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            if (sample.getIdsession() == null) {
-                return nonesession;
-            }
-            return sample.getIdsession();
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            sample = samples.get(row);
-            List<Session> sessions = new ArrayList<Session>(sample.getSessionList());
-            sessions.add(0, nonesession);
-            cb.setModel(new DefaultComboBoxModel(sessions.toArray()));
-            if (sample.getIdsession() != null) {
-                cb.setSelectedItem(sample.getIdsession());
-            } else {
-                cb.setSelectedItem(nonesession);
-            }
-            return cb;
-        }
-
-    }
+   
 
     class SeparateTableCellEditor extends AbstractCellEditor implements TableCellEditor {
 

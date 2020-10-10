@@ -43,7 +43,8 @@ public class ConfigurationDB extends DB {
     private static Type dtype;
     public static final Session anysession = ConfigurationDB.getNoneSession();
     public static final Type nonetype = ConfigurationDB.getNoneType();
-    public static final String fluojdir = "FluoJ" + File.separator;
+    public static final String pluginsdir = new File("plugins").getAbsolutePath();
+    public static final String fluojdir = pluginsdir + File.separator + "FluoJ" + File.separator;
     public static final String imagesdir = fluojdir + "images";
     public static final String propertiesfile = fluojdir + "FluoJ.properties";
     private static Properties props;
@@ -51,7 +52,7 @@ public class ConfigurationDB extends DB {
     private static String unrelatedCoreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and (sf.sample <> :sample or sf.sample is NULL)";
     private static String coreFeaturesQuery = "Select f from Feature f left join f.sampleFeatureList sf where f.roi = TRUE and sf.sample = :sample";
     private static boolean debug = false;//Shows all the steps in the image processing
-    
+
     public static void main(String[] args) {
         EntityManager em = ConfigurationDB.getEM();
         ConfigurationDB.getInstance().getSamples(em);
@@ -64,14 +65,11 @@ public class ConfigurationDB extends DB {
         }
         return cdb;
     }
-    
-    ConfigurationDB()
-    {
+
+    ConfigurationDB() {
         new File(fluojdir).mkdir();
         new File(imagesdir).mkdir();
     }
-
-    
 
     /**
      * Obtains persistent {@link Session} associated to idsample.
@@ -553,13 +551,12 @@ public class ConfigurationDB extends DB {
         try {
             List<Feature> features = em.createQuery(unrelatedCoreFeaturesQuery).setParameter("sample", sample).getResultList();
 
-          
             return features;
         } catch (Exception e) {
             throw new CDBException(e.getMessage());
         }
     }
-    
+
     public static List<SampleFeature> getCorefeatures(Sample sample, EntityManager em) {
         List<SampleFeature> features = em.createQuery(coreFeaturesQuery).setParameter("sample", sample).getResultList();
         return features;
@@ -588,24 +585,28 @@ public class ConfigurationDB extends DB {
     public static String getPath(SampleImage image) {
         return ConfigurationDB.imagesdir + File.separator + image.getIdimage() + ".tif";
     }
-    
-    
+
     public static ImagePlus getImagePlus(SampleImage image) {
-        if(image == null)
+        if (image == null) {
             return null;
+        }
         return new ImagePlus(getPath(image));
     }
 
     public static Icon getIcon(SampleImage image) {
 
         Icon icon;
-        String file;
+        String file_path;
         if (image == null) {
             return getDefaultIcon();
         } else {
-            file = getPath(image);
+            file_path = getPath(image);
         }
-        Image icon_image = new ImagePlus(file).getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        File file = new File(file_path);
+        if (!file.exists()) {
+            throw new IllegalArgumentException(file_path + " not found");
+        }
+        Image icon_image = new ImagePlus(file_path).getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         icon = new ImageIcon(icon_image);
 
         return icon;

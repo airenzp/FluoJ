@@ -352,7 +352,7 @@ public abstract class FluoJJFrame extends JFrame {
 
     protected int resetDB() {
         int result = JOptionPane
-                .showConfirmDialog(null, "Are you sure you want to reset database? \nAll classification data will be lost with this action.", "Reset Database", JOptionPane.OK_CANCEL_OPTION);
+                .showConfirmDialog(null, "All classification data will be lost with this action.\nAre you sure you want to reset database?", "Reset Database", JOptionPane.OK_CANCEL_OPTION);
         if (result == 0)// Yes
         {
             classifier = new Classifier(sample, em);

@@ -13,7 +13,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import com.nbis.fluoj.persistence.*;
-import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 
 /**
  * Represents {@link Scell} Image data. Once points, core points, parent and
@@ -129,12 +128,13 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return false;
     }
 
-   
     public boolean isValid(List<SampleFeature> sfs) {
         if (sample.getRoisMax() > 0) {
             if (rois == null || rois.isEmpty()) {
                 return false;// label must have inner particles
             } else if (rois.size() > sample.getRoisMax()) {
+                System.out.println("Rois number out of bounds: " + rois.size());
+                System.out.println(this);
                 return false;
             }
         }
@@ -143,7 +143,8 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
             for (SampleFeature sf : sfs) {
                 value = ps.getValue(sf.getFeature().getIdfeature());
                 if (value < sf.getMin() || value > sf.getMax()) {
-                    System.out.printf("Particle %s is not valid. Feature value %s out of bounds\n", this, value);
+                    System.out.println(this);
+                    System.out.printf("Feature value %s out of bounds\n", value);
                     return false;
                 }
             }
@@ -166,10 +167,11 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
 
     @Override
     public String toString() {
-        String str = "";
+        String str = String.format("%30s: %8s %8s\n\n", "Position", ps.getY(), ps.getX());
         if (sample.getSampleFeatureList() != null) {
             for (SampleFeature sf : sample.getSampleFeatureList()) {
-                str += String.format("%30s: %8.2f\n", sf.getFeature(), getParticleStatistic().getValue(sf.getFeature().getIdfeature()));
+                str += String.format("%30s: %8.2f ", sf.getFeature(), ps.getValue(sf.getFeature().getIdfeature()));
+                str += String.format("%8.2f: %8.2f\n", sf.getMin(), sf.getMax());
             }
         }
         return str;

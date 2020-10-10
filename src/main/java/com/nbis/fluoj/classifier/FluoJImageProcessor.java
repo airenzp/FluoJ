@@ -298,14 +298,7 @@ public class FluoJImageProcessor {
     }
 
     private void addBorders(SegmentedParticle il, int radius) {
-        int neighbors = (radius + 1) * (radius);// aproximated amount of
-        // neighbors to be added
-        if (il.getPoints().size() < neighbors)// can not be more possible
-        // borderpixels than particle
-        // pixels
-        {
-            return;
-        }
+    
         List<ParticlePoint> points = il.getPoints();
         List<ParticlePoint> ppoints = new ArrayList<ParticlePoint>();
         ParticlePoint bpoint;
