@@ -50,7 +50,7 @@ public class ImageParticlesTableJDialog extends JDialog {
 			throws InvalidOperationOnResourceException {
 		super(f, modal);
 		this.frame  = f;
-		this.labels = cip.getFilteredParticles();
+		this.labels = cip.getParticles();
 		Collections.sort(labels);
 		initComponents();
 	}

@@ -1,25 +1,16 @@
 package com.nbis.fluoj.gui;
 
 import ij.IJ;
-import ij.ImagePlus;
-import ij.gui.ImageCanvas;
-import ij.gui.ImageWindow;
 import ij.gui.Toolbar;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.util.List;
-import javax.swing.SwingUtilities;
-import com.nbis.fluoj.persistence.Type;
-import com.nbis.fluoj.classifier.FluoJImageProcessor;
 import com.nbis.fluoj.classifier.SegmentedParticle;
 import com.nbis.fluoj.classifier.InvalidOperationOnResourceException;
 import com.nbis.fluoj.classifier.ParticleStatistic;
@@ -39,7 +30,7 @@ public class FluoJTrainingCanvas extends FluoJImageCanvas {
 
 	public FluoJTrainingCanvas(TrainingJFrame parent) throws InvalidOperationOnResourceException {
 		super(parent);
-		this.ils = cip.getFilteredParticles();
+		this.ils = cip.getParticles();
 		this.parent = parent;
 		parent.updateCounts();
 		

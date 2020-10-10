@@ -38,7 +38,6 @@ public class FluoJImageProcessor {
 
     private ImagePlus imp;
     private List<SegmentedParticle> originalparticles;
-    private List<SegmentedParticle> filteredparticles;
     private ImageProcessor grayip;
     private ImagePlus grayimp;
     private Sample sample;
@@ -57,7 +56,7 @@ public class FluoJImageProcessor {
      *
      * Initializes {@link SegmentedParticle} list. processed_img provides a low
      * threshold segmented image. Higher threshold segmented image is obtained
-     * using      {@link MaximumFinder#findMaxima(FluoJImageProcessor, double, double, int, boolean, boolean)
+     * using null null null null null     {@link MaximumFinder#findMaxima(FluoJImageProcessor, double, double, int, boolean, boolean)
 	 * MaximumFinder}. Both images are labeled using
      * {@link counter.BinaryLabel8} to extract {@link SegmentedParticle} data.
      * From here iteration through images is done to create or find
@@ -78,7 +77,7 @@ public class FluoJImageProcessor {
      * @param classified Determines if each {@link classifier.SegmentedParticle}
      * should include a default {@link persistence.Type}. true is used for
      * manual classification and false otherwise.
-	 *
+     *
      */
     public FluoJImageProcessor(ImagePlus imp, Sample sample, boolean typed) throws InvalidOperationOnResourceException {
         this(imp, sample, typed, false);
@@ -162,7 +161,7 @@ public class FluoJImageProcessor {
                 displayProcessImage(new ImagePlus("", segmentationip), "particles labelled");
             }
             ImageProcessor roisip = null;
-            if (sample.getRoisThreshold()> 0) {
+            if (sample.getRoisThreshold() > 0) {
                 roisip = grayimp.getProcessor().duplicate();
                 roisip.threshold(sample.getRoisThreshold());// threshold
                 // applied
@@ -202,6 +201,7 @@ public class FluoJImageProcessor {
                     if (il == null) {
                         il = new SegmentedParticle(label, typed, sample, grayip, segmentationip);
                         originalparticles.add(il);
+                        il.setParticleStatistic(new ParticleStatistic(il));
                     }
                     il.addPoint(new ParticlePoint(x, y, grayip.getPixel(x, y), label));
                     if (sample.getRoisMax() > 0) {
@@ -225,10 +225,17 @@ public class FluoJImageProcessor {
                     }
 
                 }
+
             }
-            System.out.println("Filtering Particles");
-            filterParticles(sample.getSampleFeatureList());
-            System.out.println("Segmentation ended");
+            if (sample.getExpansionRadius() > 0) {
+                for (SegmentedParticle particle : originalparticles) {
+                    addBorders(particle, sample.getExpansionRadius());
+
+                    particle.initFeatures();
+                }
+            }
+
+            filterParticles(sample);
         } catch (Exception e) {
             Classifier.getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
@@ -277,28 +284,15 @@ public class FluoJImageProcessor {
         return grayimp;
     }
 
-    public void filterParticles(List<SampleFeature> sfs) {
-        System.out.printf("Starting to filter %s particles\n", originalparticles.size());
-        filteredparticles = new ArrayList<SegmentedParticle>();
-        for (SegmentedParticle il : originalparticles) {
-            if (sample.getExpansionRadius() > 0) {
-                addBorders(il, sample.getExpansionRadius());
-            }
-            if(il.getParticleStatistic() == null)
-                il.setParticleStatistic(new ParticleStatistic(il));
-            if (il.onBorder() || !il.isValid(sfs)) {
-                continue;
-            }
-           
-            filteredparticles.add(il);
-            
+    public boolean isValid(SegmentedParticle particle, Sample sample) {
+        if (particle.onBorder() || !particle.isValid(sample)) {
+            return false;
         }
-        perimeterimg = null;// labels changed, perimeter image too
-        System.out.println("Filtering particles ended");
+        return true;
     }
 
     private void addBorders(SegmentedParticle il, int radius) {
-    
+
         List<ParticlePoint> points = il.getPoints();
         List<ParticlePoint> ppoints = new ArrayList<ParticlePoint>();
         ParticlePoint bpoint;
@@ -313,14 +307,13 @@ public class FluoJImageProcessor {
             for (int y = point.y - radius; y <= point.y + radius; y++) {
                 for (int x = point.x - radius; x <= point.x + radius; x++) {
                     bpoint = new ParticlePoint(x, y, grayip.getPixel(x, y));
-                    if (grayip.getPixel(x, y) > threshold && !points.contains(bpoint)) {
+                    if (!points.contains(bpoint)) {
                         points.add(bpoint);
                     }
                 }
             }
 
         }
-
     }
 
     public SegmentedParticle getParticle(List<SegmentedParticle> particles, Point p) {
@@ -341,7 +334,7 @@ public class FluoJImageProcessor {
     public List<Scell> getCells() {
         ArrayList<Scell> scells = new ArrayList<Scell>();
         Scell ss;
-        for (SegmentedParticle il : filteredparticles) {
+        for (SegmentedParticle il : originalparticles) {
             if (typed && il.getParticleStatistic().getType() == null) {
                 continue;
             }
@@ -377,7 +370,7 @@ public class FluoJImageProcessor {
     public double getMax(int idfeature) {
         double max = Double.NEGATIVE_INFINITY;
         double value;
-        for (SegmentedParticle il : filteredparticles) {
+        for (SegmentedParticle il : originalparticles) {
             value = il.getParticleStatistic().getValue(idfeature);
             if (value > max) {
                 max = value;
@@ -389,7 +382,7 @@ public class FluoJImageProcessor {
     public double getMin(int idfeature) {
         double min = Double.POSITIVE_INFINITY;
         double value;
-        for (SegmentedParticle il : filteredparticles) {
+        for (SegmentedParticle il : originalparticles) {
             value = il.getParticleStatistic().getValue(idfeature);
             if (value < min) {
                 min = value;
@@ -403,17 +396,13 @@ public class FluoJImageProcessor {
         return idimage;
     }
 
-    public List<SegmentedParticle> getFilteredParticles() {
-        return filteredparticles;
-    }
-
     public ImagePlus getPerimetersImg() {
         if (perimeterimg == null) {
             System.out.println("Starting to draw perimeters");
             ImageProcessor ipc = grayip.duplicate().convertToRGB();
             int[] color = new int[]{255, 255, 0};// perimeter is yellow
             int[] corecolor = new int[]{0, 255, 0};// core perimeter is green
-            for (SegmentedParticle sp : filteredparticles) {
+            for (SegmentedParticle sp : originalparticles) {
 
                 for (Point point : sp.getParticleStatistic().getPpoints()) {
                     ipc.putPixel(point.x, point.y, color);
@@ -435,7 +424,7 @@ public class FluoJImageProcessor {
         return grayimp;
     }
 
-    public List<SegmentedParticle> getOriginalParticles() {
+    public List<SegmentedParticle> getParticles() {
         return originalparticles;
     }
 
@@ -443,9 +432,15 @@ public class FluoJImageProcessor {
         return sample;
     }
 
-    public void filterParticles() {
-        filterParticles(sample.getSampleFeatureList());
-
+    public void filterParticles(Sample sample) {
+        List<SegmentedParticle> fparticles = new ArrayList<SegmentedParticle>();
+        for (SegmentedParticle particle : originalparticles) {
+            if (particle.onBorder() || !particle.isValid(sample)) {
+                continue;
+            }
+            fparticles.add(particle);
+        }
+        originalparticles = fparticles;
     }
 
 }

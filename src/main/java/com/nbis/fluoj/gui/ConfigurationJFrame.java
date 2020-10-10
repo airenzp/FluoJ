@@ -287,7 +287,7 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
                 }
                 try {
                     FluoJImageProcessor cip = new FluoJImageProcessor(img, sample, false, cconfigurationdb.isDebug());
-                    processImageParticles(cip, sample.getSampleFeatureList());
+                    processImageParticles(cip, sample);
                     loadImageData(cip);
                 } catch (InvalidOperationOnResourceException e1) {
                     // TODO Auto-generated catch block
@@ -356,18 +356,18 @@ public class ConfigurationJFrame extends FluoJJFrame implements ActionListener {
 
     void processImageParticles() throws InvalidOperationOnResourceException {
 
-        processImageParticles(getCImageProcess(), sample.getSampleFeatureList());
+        processImageParticles(getCImageProcess(), sample);
 
     }
 
-    void processImageParticles(List<SampleFeature> sfs) throws InvalidOperationOnResourceException {
+    void processImageParticles(Sample sample) throws InvalidOperationOnResourceException {
 
-        processImageParticles(getCImageProcess(), sfs);
+        processImageParticles(getCImageProcess(), sample);
 
     }
 
-    public void processImageParticles(FluoJImageProcessor cip, List<SampleFeature> sfs) throws InvalidOperationOnResourceException {
-        cip.filterParticles(sfs);
+    public void processImageParticles(FluoJImageProcessor cip, Sample sample) throws InvalidOperationOnResourceException {
+        cip.filterParticles(sample);
         display(cip);
 
     }

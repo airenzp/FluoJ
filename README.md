@@ -9,7 +9,8 @@ and new descriptors can be easily added. Once configured, software can be traine
  for automatic image processing.
 
 To run this plugin you need to add the project jar generated in the target folder to the ImageJ plugins directory and renamed it to 
-FluoJ_.jar. The folder dependencies also needs to be added to the /Library/Java/Extensions folder.
+FluoJ_.jar. The project dependencies also need to be added to the /Library/Java/Extensions folder, except for the imagej library, that is
+ already present in the ImageJ installation. These jars can be obtained running the maven-assembly-plugin during compilation.
 
 
 

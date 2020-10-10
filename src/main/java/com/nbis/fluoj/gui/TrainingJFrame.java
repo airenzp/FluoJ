@@ -394,7 +394,7 @@ public class TrainingJFrame extends FluoJJFrame {
     }
 
     public void updateCounts() {
-        typespn.updateCountsFromImageParticles(cip.getFilteredParticles());
+        typespn.updateCountsFromImageParticles(cip.getParticles());
 
     }
 

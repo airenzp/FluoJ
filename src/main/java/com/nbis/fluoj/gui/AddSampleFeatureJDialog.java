@@ -145,7 +145,7 @@ public class AddSampleFeatureJDialog extends JDialog {
 				sf.setMax(max);
 				frame.resetCImageProcess();
 				try {
-					frame.processImageParticles(sfs);
+					frame.processImageParticles(sample);
 				} catch (InvalidOperationOnResourceException e1) {
 					JOptionPane.showMessageDialog(AddSampleFeatureJDialog.this, e1.getMessage());
 				}

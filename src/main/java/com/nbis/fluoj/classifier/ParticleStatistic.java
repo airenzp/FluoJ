@@ -46,10 +46,6 @@ public class ParticleStatistic {
         this.particle = particle;
         this.points = particle.getPoints();
         this.ip = particle.getGrayIP();
-        if (points.isEmpty()) {
-            throw new IllegalArgumentException("No points provided");
-        }
-        initFeatures();
     }
     
     void initFeatures()
@@ -155,6 +151,7 @@ public class ParticleStatistic {
             // doing summary on properties of inner particles
             for (SegmentedParticle roi : particle.getROIS()) {
                 roistat = new ParticleStatistic(roi);
+                roistat.initFeatures();
                 roistats.add(roistat);
                 roisarea += roistat.area;
                 if (roismaxarea < roistat.area) {
@@ -315,9 +312,10 @@ public class ParticleStatistic {
 
     public List<ParticlePoint> getIPPoints() {
         List<ParticlePoint> ippoints = new ArrayList<ParticlePoint>();
-        for (ParticleStatistic ils : roistats) {
-            ippoints.addAll(ils.ppoints);
-        }
+        if(roistats != null)
+            for (ParticleStatistic ils : roistats) {
+                ippoints.addAll(ils.ppoints);
+            }
         return ippoints;
     }
 
@@ -381,4 +379,6 @@ public class ParticleStatistic {
     public Type getType() {
         return type;
     }
+
+   
 }

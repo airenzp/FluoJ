@@ -64,6 +64,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         this.grayip = grayip;
         this.segmentedip = segmentedip;
         this.rois = new ArrayList<SegmentedParticle>();
+        
     }
 
     public SegmentedParticle(int label, boolean typed, Sample sample, ImageProcessor grayip, ImageProcessor segmentedip) {
@@ -128,7 +129,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return false;
     }
 
-    public boolean isValid(List<SampleFeature> sfs) {
+    public boolean isValid(Sample sample) {
         if (sample.getRoisMax() > 0) {
             if (rois == null || rois.isEmpty()) {
                 return false;// label must have inner particles
@@ -139,8 +140,8 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
             }
         }
         Double value;
-        if (sfs != null) {
-            for (SampleFeature sf : sfs) {
+        if (sample.getSampleFeatureList() != null) {
+            for (SampleFeature sf : sample.getSampleFeatureList()) {
                 value = ps.getValue(sf.getFeature().getIdfeature());
                 if (value < sf.getMin() || value > sf.getMax()) {
                     System.out.println(this);
@@ -238,9 +239,7 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         return icon;
     }
 
-    public void setParticleStatistic(ParticleStatistic ps) {
-        this.ps = ps;
-    }
+   
 
     public ImageProcessor getGrayIP() {
         return grayip;
@@ -249,5 +248,16 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
     public ImageProcessor getSegmentedIP() {
         return segmentedip;
     }
+
+   
+    void setParticleStatistic(ParticleStatistic ps) {
+        this.ps = ps;
+    }
+
+    void initFeatures() {
+        ps.initFeatures();
+    }
+
+   
 
 }

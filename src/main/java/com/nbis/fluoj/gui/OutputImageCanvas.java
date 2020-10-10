@@ -41,7 +41,7 @@ public class OutputImageCanvas extends FluoJImageCanvas {
         super(frame);
         this.scells = frame.getScells();
         SegmentedParticle particle = null;
-        particles = cip.getFilteredParticles();
+        particles = cip.getParticles();
         for (Scell ss : scells) {
             particle = cip.getParticle(particles, new Point(ss.getX(), ss.getY()));
             if (particle != null) {
