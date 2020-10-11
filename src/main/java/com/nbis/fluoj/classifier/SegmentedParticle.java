@@ -258,6 +258,10 @@ public class SegmentedParticle implements Comparable<SegmentedParticle> {
         ps.initFeatures();
     }
 
+    void setRois(List<SegmentedParticle> prois) {
+        rois = prois;
+    }
+
    
 
 }

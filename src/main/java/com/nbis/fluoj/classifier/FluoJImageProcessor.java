@@ -37,7 +37,8 @@ import counter.BinaryLabel8;
 public class FluoJImageProcessor {
 
     private ImagePlus imp;
-    private List<SegmentedParticle> originalparticles;
+    private List<SegmentedParticle> particles;
+    private List<SegmentedParticle> notvalid_particles;
     private ImageProcessor grayip;
     private ImagePlus grayimp;
     private Sample sample;
@@ -56,7 +57,7 @@ public class FluoJImageProcessor {
      *
      * Initializes {@link SegmentedParticle} list. processed_img provides a low
      * threshold segmented image. Higher threshold segmented image is obtained
-     * using null null null null null     {@link MaximumFinder#findMaxima(FluoJImageProcessor, double, double, int, boolean, boolean)
+     * using null null null null null null     {@link MaximumFinder#findMaxima(FluoJImageProcessor, double, double, int, boolean, boolean)
 	 * MaximumFinder}. Both images are labeled using
      * {@link counter.BinaryLabel8} to extract {@link SegmentedParticle} data.
      * From here iteration through images is done to create or find
@@ -179,7 +180,7 @@ public class FluoJImageProcessor {
                 }
             }
 
-            originalparticles = new ArrayList<SegmentedParticle>();
+            particles = new ArrayList<SegmentedParticle>();
             int label = -1;
             SegmentedParticle il = null, roi = null;
 
@@ -193,14 +194,14 @@ public class FluoJImageProcessor {
                         continue;
                     }
                     il = null;
-                    for (SegmentedParticle iliter : originalparticles) {
+                    for (SegmentedParticle iliter : particles) {
                         if (iliter.getLabel() == label) {
                             il = iliter;
                         }
                     }
                     if (il == null) {
                         il = new SegmentedParticle(label, typed, sample, grayip, segmentationip);
-                        originalparticles.add(il);
+                        particles.add(il);
                         il.setParticleStatistic(new ParticleStatistic(il));
                     }
                     il.addPoint(new ParticlePoint(x, y, grayip.getPixel(x, y), label));
@@ -227,12 +228,16 @@ public class FluoJImageProcessor {
                 }
 
             }
-            if (sample.getExpansionRadius() > 0) {
-                for (SegmentedParticle particle : originalparticles) {
-                    addBorders(particle, sample.getExpansionRadius());
-
-                    particle.initFeatures();
+            for (SegmentedParticle particle : particles) {
+                addBorders(particle, sample.getExpansionRadius());
+                List<SegmentedParticle> prois = new ArrayList<SegmentedParticle>();
+                for (SegmentedParticle proi : particle.getROIS()) {
+                    if (proi.getPoints().size() >= 50) {
+                        prois.add(proi);
+                    }
                 }
+                particle.setRois(prois);
+                particle.initFeatures();
             }
 
             filterParticles(sample);
@@ -292,6 +297,9 @@ public class FluoJImageProcessor {
     }
 
     private void addBorders(SegmentedParticle il, int radius) {
+        if (radius == 0) {
+            return;
+        }
 
         List<ParticlePoint> points = il.getPoints();
         List<ParticlePoint> ppoints = new ArrayList<ParticlePoint>();
@@ -301,7 +309,6 @@ public class FluoJImageProcessor {
                 ppoints.add(point);
             }
         }
-        int threshold = sample.getImageThreshold();// Bright borders have more
         // threshold
         for (ParticlePoint point : ppoints) {
             for (int y = point.y - radius; y <= point.y + radius; y++) {
@@ -334,7 +341,7 @@ public class FluoJImageProcessor {
     public List<Scell> getCells() {
         ArrayList<Scell> scells = new ArrayList<Scell>();
         Scell ss;
-        for (SegmentedParticle il : originalparticles) {
+        for (SegmentedParticle il : particles) {
             if (typed && il.getParticleStatistic().getType() == null) {
                 continue;
             }
@@ -370,7 +377,7 @@ public class FluoJImageProcessor {
     public double getMax(int idfeature) {
         double max = Double.NEGATIVE_INFINITY;
         double value;
-        for (SegmentedParticle il : originalparticles) {
+        for (SegmentedParticle il : particles) {
             value = il.getParticleStatistic().getValue(idfeature);
             if (value > max) {
                 max = value;
@@ -382,7 +389,7 @@ public class FluoJImageProcessor {
     public double getMin(int idfeature) {
         double min = Double.POSITIVE_INFINITY;
         double value;
-        for (SegmentedParticle il : originalparticles) {
+        for (SegmentedParticle il : particles) {
             value = il.getParticleStatistic().getValue(idfeature);
             if (value < min) {
                 min = value;
@@ -402,7 +409,7 @@ public class FluoJImageProcessor {
             ImageProcessor ipc = grayip.duplicate().convertToRGB();
             int[] color = new int[]{255, 255, 0};// perimeter is yellow
             int[] corecolor = new int[]{0, 255, 0};// core perimeter is green
-            for (SegmentedParticle sp : originalparticles) {
+            for (SegmentedParticle sp : particles) {
 
                 for (Point point : sp.getParticleStatistic().getPpoints()) {
                     ipc.putPixel(point.x, point.y, color);
@@ -425,7 +432,7 @@ public class FluoJImageProcessor {
     }
 
     public List<SegmentedParticle> getParticles() {
-        return originalparticles;
+        return particles;
     }
 
     public Sample getSample() {
@@ -434,13 +441,22 @@ public class FluoJImageProcessor {
 
     public void filterParticles(Sample sample) {
         List<SegmentedParticle> fparticles = new ArrayList<SegmentedParticle>();
-        for (SegmentedParticle particle : originalparticles) {
-            if (particle.onBorder() || !particle.isValid(sample)) {
+        notvalid_particles = new ArrayList<SegmentedParticle>();
+        for (SegmentedParticle particle : particles) {
+            if (particle.onBorder()) {
+                continue;
+            }
+            if (!particle.isValid(sample)) {
+                notvalid_particles.add(particle);
                 continue;
             }
             fparticles.add(particle);
         }
-        originalparticles = fparticles;
+        particles = fparticles;
+    }
+
+    public List<SegmentedParticle> getNotValidParticles() {
+        return notvalid_particles;
     }
 
 }
